@@ -10,7 +10,7 @@ function NavBar() {
                     <a href="#projects-section">Projects</a>
                     <a href="#involvement-section">Involvement</a>
                     <a href="#awards-section">Awards</a>
-                    <a href="#contact-contact">Contact</a>
+                    <a href="#contact-section">Contact</a>
                 </div>
 
             </StarBorder>
