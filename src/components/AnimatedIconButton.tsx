@@ -8,7 +8,7 @@ export interface Props {
   className?: string;
 }
 
-function AnimatedIconButton({ activeLogo, inactiveLogo, href, alt = "Social media icon", className }: Props) {
+function AnimatedIconButton({ activeLogo, inactiveLogo, href, className }: Props) {
 
     const [visibleLogo, setVisibleLogo] = useState(inactiveLogo);
 
