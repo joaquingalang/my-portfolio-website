@@ -17,7 +17,7 @@ function AnimatedIconButton({ activeLogo, inactiveLogo, href, className }: Props
         <div className="transform transition-transform duration-300 hover:-translate-y-1"
             onPointerEnter={() => setVisibleLogo(activeLogo)}
             onPointerLeave={() => setVisibleLogo(inactiveLogo)}>
-            <img src={visibleLogo} className={`w-[5rem] h-[5rem] object-contain aspect-square transition-[filter] duration-200 hover:brightness-110 ${className}`} />
+            <img src={visibleLogo} className={`object-contain aspect-square transition-[filter] duration-200 hover:brightness-110 ${className ?? 'w-[5rem] h-[5rem]'}`} />
         </div>
     </a>
 
