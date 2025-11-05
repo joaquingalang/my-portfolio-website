@@ -54,9 +54,9 @@ function ContactSection() {
 
                     <p className="font-poppins subtitle text-light text-lg font-light mt-3">Want to collaborate? Leave me a message. Let's build cool stuff together.</p>
 
-                    <div className="grid grid-cols-9 mt-10">
+                    <div className="grid grid-cols-8 mt-10">
                         
-                        <div className="col-span-9 sm:col-span-4 order-2 sm:order-1">
+                        <div className="col-span-8 sm:col-span-4 order-2 sm:order-1">
                             <form>
                                 <p className="font-chakra text-light text-sm md:text-base lg:text-lg font-medium mb-1">Full Name</p>
                                 <input type="text" placeholder="John Doe" className="w-full font-poppins text-sm md:text-base lg:text-lg text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-3"/>
@@ -73,8 +73,8 @@ function ContactSection() {
                             </form>
                         </div>
 
-                        <div className="col-span-9 sm:col-span-5 order-1 sm:order-2">
-                            <div className="relative flex size-full justify-center overflow-hidden pb-10">
+                        <div className="col-span-8 sm:col-span-4 order-1 sm:order-2">
+                            <div className="relative flex size-full justify-end overflow-hidden pb-10">
                                 <IconCloud images={images} />
                             </div>
                         </div>
