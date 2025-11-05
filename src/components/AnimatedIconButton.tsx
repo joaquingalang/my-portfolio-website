@@ -4,16 +4,16 @@ export interface Props {
   activeLogo: string;
   inactiveLogo: string;
   href: string;
-  alt?: string;
+  target?: string;
   className?: string;
 }
 
-function AnimatedIconButton({ activeLogo, inactiveLogo, href, className }: Props) {
+function AnimatedIconButton({ activeLogo, inactiveLogo, href, target, className }: Props) {
 
     const [visibleLogo, setVisibleLogo] = useState(inactiveLogo);
 
     return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
+    <a href={href} target={target ?? ""} rel="noopener noreferrer">
         <div className="transform transition-transform duration-300 hover:-translate-y-1"
             onPointerEnter={() => setVisibleLogo(activeLogo)}
             onPointerLeave={() => setVisibleLogo(inactiveLogo)}>

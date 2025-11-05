@@ -17,21 +17,20 @@ function Footer() {
                         activeLogo={GitHubLoop} 
                         inactiveLogo={GitHubStatic} 
                         href="https://github.com/joaquingalang"
-                        alt="GitHub Profile"
+                        target="_blank"
                         className="w-[2.5rem] h-[2.5rem]"
                     />
                     <AnimatedIconButton 
                         activeLogo={LinkedInLoop} 
                         inactiveLogo={LinkedInStatic} 
                         href="https://www.linkedin.com/in/joaquin-galang/"
-                        alt="LinkedIn Profile"
+                        target="_blank"
                         className="w-[2.5rem] h-[2.5rem]"
                     />
                     <AnimatedIconButton 
                         activeLogo={EmailLoop} 
                         inactiveLogo={EmailStatic} 
-                        href=""
-                        alt="Contact Email"
+                        href="mailto:galang.joaquin.dev@gmail.com"
                         className="w-[2.5rem] h-[2.5rem]"
                     />
                 </div>

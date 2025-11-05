@@ -51,22 +51,21 @@ function HeroSection() {
                                 activeLogo={GitHubLoop} 
                                 inactiveLogo={GitHubStatic} 
                                 href="https://github.com/joaquingalang"
-                                alt="GitHub Profile"
+                                target="_blank"
                             />
                             <AnimatedIconButton 
                                 activeLogo={LinkedInLoop} 
                                 inactiveLogo={LinkedInStatic} 
                                 href="https://www.linkedin.com/in/joaquin-galang/"
-                                alt="LinkedIn Profile"
+                                target="_blank"
                             />
                             <AnimatedIconButton 
                                 activeLogo={EmailLoop} 
                                 inactiveLogo={EmailStatic} 
-                                href=""
-                                alt="Contact Email"
+                                href="mailto:galang.joaquin.dev@email.com"
                             />
 
-                            <hr className="border border rounded-full border-light w-full overflow"/>
+                            <hr className="border rounded-full border-light w-full overflow"/>
 
                         </div>
                         
