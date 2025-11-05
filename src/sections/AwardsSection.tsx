@@ -11,7 +11,7 @@ import AppconLogo from "../assets/images/appcon_logo.jpg";
 
 function AwardSection() {
     return (
-        <section id="awards-section">
+        <section id="awards-section" className="scroll-mt-24">
             <div className="min-h-[40rem] grid grid-cols-12 mt-[8rem]">
                 <div className="col-start-3 col-span-8">
                     <div className="w-full flex flex-col items-center">

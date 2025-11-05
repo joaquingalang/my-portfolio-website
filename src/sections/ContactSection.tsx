@@ -30,7 +30,11 @@ const slugs = [
   "mysql",
   "unity",
   "datacamp",
-  "roll20"
+  "roll20",
+  "slack",
+  "stackoverflow",
+  "netlify",
+  "gemini",
 ]
 
 function ContactSection() {
@@ -40,8 +44,8 @@ function ContactSection() {
     )
 
     return (
-        <section id="contact-section" className="min-h-[40vh] mt-[8rem]">
-            <div className="grid grid-cols-12">
+        <section id="contact-section" className="scroll-mt-24">
+            <div className="min-h-[40vh] mt-[8rem] grid grid-cols-12">
                 <div className="col-start-3 col-span-9">
 
                     <SectionLabel activeIcon={ContactLoop} inactiveIcon={ContactStatic} title="get in touch"/>

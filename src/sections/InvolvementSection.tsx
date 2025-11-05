@@ -8,8 +8,8 @@ import InvolvementTile from "../components/InvolvementTile";
 
 function InvolvementSection() {
     return (
-        <section id="involvement-section" className="min-h-[40vh] mt-[8rem]">
-                <div className="grid grid-cols-12">
+        <section id="involvement-section" className="scroll-mt-24">
+                <div className="grid grid-cols-12 min-h-[40vh] mt-[8rem]">
                     <div className="col-start-3 col-span-8 grid grid-cols-10">
 
                         <div className="col-span-4">
