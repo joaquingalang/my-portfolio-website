@@ -5,9 +5,11 @@ export interface Props {
     imagePath: string;
     title: string;
     desc: string;
+    codeLink?: string;
+    projLink?: string;
 }
 
-function ProjectCell({ imagePath, title, desc }: Props) {
+function ProjectCell({ imagePath, title, desc, codeLink, projLink }: Props) {
     return (
         <div className="col-span-8 md:col-span-4">
             <img src={imagePath} className="object-cover rounded-2xl w-full h-[20rem] flex justify-between mt-2"/>
@@ -19,13 +21,13 @@ function ProjectCell({ imagePath, title, desc }: Props) {
 
                 <div className="flex gap-3">
                     
-                    <button className="bg-light/10 rounded-xl w-[60px] h-[60px] flex justify-center items-center">
-                        <img src={CodeIcon} className="w-[2rem]"/>
-                    </button>
+                    <a href={codeLink} className="bg-light/10 rounded-xl w-[60px] h-[60px] flex justify-center items-center">
+                        <img src={CodeIcon} className={`w-[2rem] ${codeLink ?? "opacity-10"}`}/>
+                    </a>
                 
-                    <button className="bg-light/10 rounded-xl w-[60px] h-[60px] flex justify-center items-center">
-                        <img src={NorthEastIcon} className="w-[2rem]"/>
-                    </button>
+                    <a href={projLink} className="bg-light/10 rounded-xl w-[60px] h-[60px] flex justify-center items-center">
+                        <img src={NorthEastIcon} className={`w-[2rem] ${projLink ?? "opacity-10"}`}/>
+                    </a>
                     
                 </div>
             </div>
