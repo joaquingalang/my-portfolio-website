@@ -21,11 +21,11 @@ function ProjectCell({ imagePath, title, desc, codeLink, projLink }: Props) {
 
                 <div className="flex gap-3">
                     
-                    <a href={codeLink} className="bg-light/10 rounded-xl w-[60px] h-[60px] flex justify-center items-center">
+                    <a href={codeLink} target="_blank" className="bg-light/10 rounded-xl w-[60px] h-[60px] flex justify-center items-center">
                         <img src={CodeIcon} className={`w-[2rem] ${codeLink ?? "opacity-10"}`}/>
                     </a>
                 
-                    <a href={projLink} className="bg-light/10 rounded-xl w-[60px] h-[60px] flex justify-center items-center">
+                    <a href={projLink} target="_blank" className="bg-light/10 rounded-xl w-[60px] h-[60px] flex justify-center items-center">
                         <img src={NorthEastIcon} className={`w-[2rem] ${projLink ?? "opacity-10"}`}/>
                     </a>
                     
