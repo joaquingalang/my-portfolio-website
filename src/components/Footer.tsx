@@ -10,7 +10,7 @@ function Footer() {
     return (
         <div>
             <hr className="border border-light/10 rounded-full mt-[5rem]"/>
-            <div className="w-full h-[5rem] flex justify-between items-center px-7">
+            <div className="w-full flex flex-col md:flex-row gap-5 justify-between items-center p-7">
                 <p className="font-poppins text-light/50 text-center">Copyright © 2025 Joaquin Galang. All rights reserved.</p>
                 <div className="flex gap-5">
                     <AnimatedIconButton 

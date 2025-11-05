@@ -10,7 +10,7 @@ import SkillSection from "../sections/SkillSection";
 
 function HomePage() {
     return (
-        <div className="bg-dark w-full min-h-screen relative">
+        <div className="bg-dark">
 
             {/* Navigation Bar */}
             <NavBar/>

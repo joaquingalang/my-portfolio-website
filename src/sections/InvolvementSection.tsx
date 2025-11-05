@@ -8,25 +8,22 @@ import InvolvementTile from "../components/InvolvementTile";
 
 function InvolvementSection() {
     return (
-        <section id="involvement-section" className="scroll-mt-24">
-                <div className="grid grid-cols-12 min-h-[40vh] mt-[8rem]">
-                    <div className="col-start-3 col-span-8 grid grid-cols-10">
-
-                        <div className="col-span-4">
-                            <SectionLabel activeIcon={InvolvementLoop} inactiveIcon={InvolvementStatic} title="orgs & positions"/>
-                            <p className="font-chakra text-light text-5xl font-bold mt-2">Community Involvement</p>
-                        </div>
-
-                        
-                        <div className="col-span-6">
-                            <InvolvementTile imagePath={DevconLogo} position="Core Team" term="January 2025 — Present" desc="Actively organize, facilitate, and host tech events—including workshops, competitions, and seminars—to support the developer community in Pampanga."/>
-                            <hr className="border border-light/10 rounded-full my-5"/>
-                            <InvolvementTile imagePath={GdgLogo} position="Mobile Development Lead" term="July 2024 — April 2025" desc="Conducted Flutter training for student developers and assisted in organizing related technical workshops and events."/>
-                            <hr className="border border-light/10 rounded-full my-5"/>
-                            <InvolvementTile imagePath={LoopLogo} position="Vice President" term="July 2023 — June 2024" desc="Help cultivate a learning-driven environment at Holy Angel University through organizing and facilitating CS-focused workshops, seminars, and tutorials."/>
-                        </div>                        
-
+        <section id="involvement-section" className="scroll-mt-24 flex justify-center items-center">
+                <div className="pb-[5rem] mx-10 w-full md:max-w-[70vw] grid grid-cols-10">
+                    <div className="col-span-10 md:col-span-4 mb-[3rem]">
+                        <SectionLabel activeIcon={InvolvementLoop} inactiveIcon={InvolvementStatic} title="leadership & service"/>
+                        <p className="font-chakra title text-light font-bold mt-2">Community Involvement</p>
+                        <p className="flex md:hidden font-poppins subtitle text-light font-light mt-3">Engaging with communities through leadership, collaboration, and initiatives that create lasting positive change.</p>
                     </div>
+
+                    
+                    <div className="col-span-10 md:col-span-6">
+                        <InvolvementTile imagePath={DevconLogo} position="Core Team" term="January 2025 — Present" desc="Actively organize, facilitate, and host tech events—including workshops, competitions, and seminars—to support the developer community in Pampanga."/>
+                        <hr className="border border-light/10 rounded-full my-5"/>
+                        <InvolvementTile imagePath={GdgLogo} position="Mobile Development Lead" term="July 2024 — April 2025" desc="Conducted Flutter training for student developers and assisted in organizing related technical workshops and events."/>
+                        <hr className="border border-light/10 rounded-full my-5"/>
+                        <InvolvementTile imagePath={LoopLogo} position="Vice President" term="July 2023 — June 2024" desc="Help cultivate a learning-driven environment at Holy Angel University through organizing and facilitating CS-focused workshops, seminars, and tutorials."/>
+                    </div>                        
                 </div>
         </section>
     );

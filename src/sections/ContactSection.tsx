@@ -44,19 +44,19 @@ function ContactSection() {
     )
 
     return (
-        <section id="contact-section" className="scroll-mt-24">
-            <div className="min-h-[40vh] mt-[8rem] grid grid-cols-12">
-                <div className="col-start-3 col-span-9">
+        <section id="contact-section" className="scroll-mt-24 flex justify-center items-center">
+            <div className="pb-[5rem] mx-10 w-full md:max-w-[70vw] grid grid-cols-9">
+                <div className="col-span-9">
 
                     <SectionLabel activeIcon={ContactLoop} inactiveIcon={ContactStatic} title="get in touch"/>
 
-                    <p className="font-chakra text-light text-5xl font-bold mt-2">Contact Me</p>
+                    <p className="font-chakra title text-light font-bold mt-2">Contact Me</p>
 
-                    <p className="font-poppins text-light text-lg font-light mt-3">Want to collaborate? Leave me a message. Let's build cool stuff together.</p>
+                    <p className="font-poppins subtitle text-light text-lg font-light mt-3">Want to collaborate? Leave me a message. Let's build cool stuff together.</p>
 
                     <div className="grid grid-cols-9 mt-10">
                         
-                        <div className="col-span-4">
+                        <div className="col-span-9 sm:col-span-4 order-2 sm:order-1">
                             <form>
                                 <p className="font-chakra text-light text-lg font-medium mb-1">Full Name</p>
                                 <input type="text" placeholder="John Doe" className="w-full font-poppins text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-3"/>
@@ -73,7 +73,7 @@ function ContactSection() {
                             </form>
                         </div>
 
-                        <div className="col-span-5">
+                        <div className="col-span-9 sm:col-span-5 order-1 sm:order-2">
                             <div className="relative flex size-full justify-center overflow-hidden pb-10">
                                 <IconCloud images={images} />
                             </div>

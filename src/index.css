@@ -1,7 +1,26 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities;W
 
 html {
     scroll-behavior: smooth;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slideDown {
+  animation: slideDown .2s ease-out;
+}
+
+
+@layer utilities {
+  .title {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+
+  .subtitle {
+    @apply text-sm md:text-base lg:text-lg;
+  }
 }
