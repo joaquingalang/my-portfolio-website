@@ -18,6 +18,16 @@ html {
 @layer base {
   html {
     scroll-behavior: smooth;
+  } 
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset !important; /* match your bg color */
+    -webkit-text-fill-color: #ffffff !important; /* match your text color */
+    transition: background-color 9999s ease-in-out 0s;
   }
 }
 
