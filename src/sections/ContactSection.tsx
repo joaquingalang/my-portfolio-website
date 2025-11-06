@@ -2,23 +2,21 @@ import SectionLabel from "../components/SectionLabel";
 import ContactLoop from "../assets/images/contact_loop.gif";
 import ContactStatic from "../assets/images/contact_static.png";
 import { IconCloud } from "../components/IconCloud";
+import ContactForm from "../components/ContactForm";
 
 const slugs = [
   "typescript",
   "javascript",
   "dart",
-  "java",
   "react",
   "flutter",
   "android",
   "html5",
-  "css3",
+  "css",
   "nodedotjs",
   "firebase",
-  "java",
   "git",
   "python",
-  "visualstudiocode",
   "androidstudio",
   "figma",
   "supabase",
@@ -34,7 +32,6 @@ const slugs = [
   "slack",
   "stackoverflow",
   "netlify",
-  "gemini",
 ]
 
 function ContactSection() {
@@ -57,20 +54,7 @@ function ContactSection() {
                     <div className="grid grid-cols-8 mt-10">
                         
                         <div className="col-span-8 md:col-span-4 order-2 md:order-1">
-                            <form>
-                                <p className="font-chakra text-light text-sm md:text-base lg:text-lg font-medium mb-1">Full Name</p>
-                                <input type="text" placeholder="John Doe" className="w-full font-poppins text-xs md:text-sm lg:text-base text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-3"/>
-
-                                <p className="font-chakra text-light text-sm md:text-base lg:text-lg font-medium mb-1">Email Address</p>
-                                <input type="email" placeholder="johndoe@gmail.com" className="w-full font-poppins text-xs md:text-sm lg:text-base text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-3"/>
-
-                                <p className="font-chakra text-light text-sm md:text-base lg:text-lg font-medium mb-1">Message</p>
-                                <textarea placeholder="Leave your message here..." className="w-full min-h-[15rem] font-poppins text-xs md:text-sm lg:text-base text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-3"/>
-                                
-                                <div className="w-full flex justify-end">
-                                    <input type="submit" className="bg-white/10 border-2 border-gray rounded-lg px-5 py-2 font-poppins text-sm md:text-base lg:text-lg text-primary text-md whitespace-nowrap"/>
-                                </div>
-                            </form>
+                            <ContactForm/>
                         </div>
 
                         <div className="col-span-8 md:col-span-4 order-1 md:order-2">
