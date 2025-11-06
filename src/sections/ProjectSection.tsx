@@ -12,7 +12,7 @@ import GdscHau from "../assets/images/gdsc_hau.png";
 function ProjectSection() {
     return (
         <section id="projects-section" className="scroll-mt-24 flex justify-center items-center">
-            <div className="pb-[5rem] mx-10 w-full md:max-w-[70vw] grid grid-cols-8 gap-[3rem]">
+            <div className="pb-[5rem] mx-10 w-full md:max-w-[1000px] grid grid-cols-8 gap-[3rem]">
                 <div className="col-span-8">
                     <SectionLabel activeIcon={WorkLoop} inactiveIcon={WorkStatic} title="works selected"/>
                     <p className="font-chakra title text-light font-bold mt-2">My Projects</p>

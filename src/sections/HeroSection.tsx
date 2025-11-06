@@ -12,7 +12,7 @@ function HeroSection() {
     return (
         <section id="landing-section" className="pt-5 min-h-[80vh] flex justify-center items-center">
             
-            <div className="my-[5rem] sm:my-0 mx-10 w-full md:max-w-[70vw] grid grid-cols-8">
+            <div className="my-[5rem] sm:my-0 mx-10 w-full md:max-w-[1000px] grid grid-cols-8">
 
                 <div className="col-span-8 sm:col-span-3 border border-transparent flex justify-center md:justify-end">
 

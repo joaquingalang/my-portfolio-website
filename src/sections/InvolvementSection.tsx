@@ -9,7 +9,7 @@ import InvolvementTile from "../components/InvolvementTile";
 function InvolvementSection() {
     return (
         <section id="involvement-section" className="scroll-mt-24 flex justify-center items-center">
-                <div className="pb-[5rem] mx-10 w-full md:max-w-[70vw] grid grid-cols-10">
+                <div className="pb-[5rem] mx-10 w-full md:max-w-[1000px] grid grid-cols-10">
                     <div className="col-span-10 md:col-span-4 mb-[3rem]">
                         <SectionLabel activeIcon={InvolvementLoop} inactiveIcon={InvolvementStatic} title="leadership & service"/>
                         <p className="font-chakra title text-light font-bold mt-2">Community Involvement</p>
