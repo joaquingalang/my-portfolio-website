@@ -13,7 +13,7 @@ function AboutSection() {
                     <SectionLabel title="about me" activeIcon={ProfileLoop} inactiveIcon={ProfileStatic}/>
 
                     <TextType 
-                    text={["I'm Joaquin, a developer focused on building clean, intuitive, and impactful digital experiences. I work across mobile and web — especially with Flutter, Firebase, and Supabase — and enjoy turning ideas into products that solve real problems and delight users"]}
+                    text={["Hi, I’m Joaquin — a developer passionate about crafting clean, intuitive, and impactful digital experiences. I build across mobile and web using Flutter, React, Firebase, and Node.js, and I love turning ideas into real products that solve problems and bring people joy."]}
                     typingSpeed={5}
                     pauseDuration={1500}
                     showCursor={true}
