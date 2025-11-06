@@ -19,10 +19,10 @@ function ProjectCell({ imagePath, title, desc, codeLink, projLink }: Props) {
 
             <div className="flex justify-between mt-5">
                 <div>
-                    <p className="font-poppins text-light text-xl md:text-2xl lg:text-3xl font-medium">
+                    <p className="font-poppins text-light text-xl lg:text-3xl font-medium">
                         {title}
                     </p>
-                    <p className="font-chakra text-light/50 text-xs md:text-sm lg:text-md font-extralight">
+                    <p className="font-chakra text-light/50 text-xs md:text-sm lg:text-base font-extralight">
                         {desc}
                     </p>
                 </div>
