@@ -28,7 +28,7 @@ function NavBar() {
 
         {/* Mobile Button */}
         <button
-          className="font-poppins text-light flex sm:hidden items-center gap-2 font-poppins text-base"
+          className="font-poppins text-light flex sm:hidden items-center gap-2 text-base"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X size={22} /> : <Menu size={22} />}
