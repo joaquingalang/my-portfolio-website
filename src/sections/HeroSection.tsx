@@ -39,9 +39,7 @@ function HeroSection() {
                         />
                     </h1>
 
-                    <div className="flex gap-[10px] mt-2 md:mt-4 items-center">
-                        
-                        <hr className="flex sm:hidden border rounded-full border-light flex-grow overflow"/>
+                    <div className="flex gap-[10px] mt-2 md:mt-4 justify-center md:justify-start items-center">
                         
                         <button className="bg-white/10 border-2 border-gray rounded-full px-6 py-2 md:px-[30px] md:py-[10px]">
                             <p className="font-poppins text-primary text-sm md:text-md whitespace-nowrap">Download CV</p>
@@ -65,7 +63,7 @@ function HeroSection() {
                             href="mailto:galang.joaquin.dev@email.com"
                         />
 
-                        <hr className="border rounded-full border-light flex-grow overflow"/>
+                        <hr className="hidden md:flex border rounded-full border-light flex-grow overflow"/>
 
                     </div>
                 </div>
