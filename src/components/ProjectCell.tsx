@@ -33,8 +33,7 @@ function ProjectCell({ imagePath, title, desc, codeLink, projLink }: Props) {
                     <a
                         href={codeLink}
                         target="_blank"
-                        className="bg-light/10 rounded-md sm:rounded-lg md:rounded-xl flex justify-center items-center
-                                   w-[40px] h-[40px] sm:w-[48px] sm:h-[48px] md:w-[60px] md:h-[60px]"
+                        className={`bg-light/10 rounded-md sm:rounded-lg md:rounded-xl flex justify-center items-center w-[40px] h-[40px] sm:w-[48px] sm:h-[48px] md:w-[60px] md:h-[60px] ${codeLink && "transition-transform duration-300 hover:scale-110"}`}
                     >
                         <img
                             src={CodeIcon}
@@ -46,8 +45,7 @@ function ProjectCell({ imagePath, title, desc, codeLink, projLink }: Props) {
                     <a
                         href={projLink}
                         target="_blank"
-                        className="bg-light/10 rounded-md sm:rounded-lg md:rounded-xl flex justify-center items-center
-                                   w-[40px] h-[40px] sm:w-[48px] sm:h-[48px] md:w-[60px] md:h-[60px]"
+                        className={`bg-light/10 rounded-md sm:rounded-lg md:rounded-xl flex justify-center items-center w-[40px] h-[40px] sm:w-[48px] sm:h-[48px] md:w-[60px] md:h-[60px] ${projLink && "transition-transform duration-300 hover:scale-110"}`}
                     >
                         <img
                             src={NorthEastIcon}
