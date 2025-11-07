@@ -68,7 +68,7 @@ function ContactForm() {
         name="full_name"
         placeholder="John Doe"
         required
-        className="w-full font-poppins text-xs md:text-sm lg:text-base text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-5 rounded-md"
+        className="w-full font-poppins text-sm md:text-base lg:text-lg text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-5 rounded-md"
       />
 
       {/* Email */}
@@ -80,7 +80,7 @@ function ContactForm() {
         name="email"
         placeholder="johndoe@gmail.com"
         required
-        className="w-full font-poppins text-xs md:text-sm lg:text-base text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-5 rounded-md"
+        className="w-full font-poppins text-sm md:text-base lg:text-lg text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-5 rounded-md"
       />
 
       {/* Message */}
@@ -91,7 +91,7 @@ function ContactForm() {
         name="message"
         placeholder="Leave your message here..."
         required
-        className="w-full min-h-[15rem] font-poppins text-xs md:text-sm lg:text-base text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-5 rounded-md resize-none"
+        className="w-full min-h-[15rem] font-poppins text-sm md:text-base lg:text-lg text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-5 rounded-md resize-none"
       />
 
       {/* Submit Button */}
