@@ -26,7 +26,7 @@ function HeroSection() {
                     <h1 className="font-sarpanch text-light text-3xl md:text-4xl lg:text-5xl font-bold m-0 text-center sm:text-start">
                         <span className="mr-3">A full-stack developer building</span>
                         <RotatingText
-                            texts={['websites', 'mobile apps', 'experiences']}
+                            texts={['frontend', 'backend', 'mobile', 'experiences']}
                             mainClassName="inline-block font-sarpanch text-light text-3xl md:text-4xl lg:text-5xl font-bold px-2 md:px-3 bg-primary my-1 py-1 lg:py-2 justify-center rounded-lg overflow-hidden"
                             staggerFrom={"last"}
                             initial={{ y: "100%" }}
@@ -42,7 +42,7 @@ function HeroSection() {
                     <div className="flex gap-[10px] mt-2 md:mt-4 justify-center md:justify-start items-center">
                         
                         <button className="bg-white/10 border-2 border-gray rounded-full px-6 py-2 md:px-[30px] md:py-[10px]">
-                            <p className="font-poppins text-primary text-sm md:text-md whitespace-nowrap">Download CV</p>
+                            <p className="font-poppins text-primary text-sm md:text-base whitespace-nowrap">Download CV</p>
                         </button>
 
                         <AnimatedIconButton 
