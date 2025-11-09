@@ -42,7 +42,7 @@ function HeroSection() {
                     <div className="flex gap-[10px] mt-2 md:mt-4 justify-center md:justify-start items-center">
                         
                         <a 
-                            href="https://drive.google.com/file/d/1sGHAa_b9uuhwNpJTEkXK_LZ3hgwhVLle/view?usp=drive_link"
+                            href="https://drive.google.com/file/d/1DjSq22DY-M9syVXXbIA7W4s0BJB3y6ad/view?usp=sharing"
                             target="_blank"
                             className="bg-white/10 border-2 border-gray rounded-full px-6 py-2 md:px-[30px] md:py-[10px]"
                         >
