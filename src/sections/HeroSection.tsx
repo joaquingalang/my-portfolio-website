@@ -44,9 +44,9 @@ function HeroSection() {
                         <a 
                             href="https://drive.google.com/file/d/1EwVW_YXibQH2VvfNaptXbqtXi5SQX04_/view?usp=sharing"
                             target="_blank"
-                            className="bg-white/10 border-2 border-gray rounded-full px-6 py-2 md:px-[30px] md:py-[10px]"
+                            className="bg-white/10 text-primary border-2 border-gray rounded-full px-6 py-2 md:px-[30px] md:py-[10px] transition-colors duration-300 hover:bg-primary hover:text-dark hover:border-primary"
                         >
-                            <p className="font-poppins text-primary text-sm md:text-base whitespace-nowrap">Download CV</p>
+                            <p className="font-poppins text-sm md:text-base whitespace-nowrap">Download CV</p>
                         </a>
 
                         <AnimatedIconButton 
