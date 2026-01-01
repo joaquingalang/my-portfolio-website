@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# 🌐 Joaquin Galang — Portfolio Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome! This repository contains the source code for my personal portfolio website.  
+It serves as a showcase of my work, technical skills, and involvement in projects and communities I care about.
 
-Currently, two official plugins are available:
+🔗 **Live site:** *(add your URL here)*
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 👋 About Me
 
-## React Compiler
+Hi! I’m **Joaquin Galang**, a **Fullstack Developer** with a strong interest in building clean, functional, and user-focused web applications.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This portfolio highlights:
+- Selected technical projects
+- Community and organizational involvement
+- Awards and recognitions
+- Ways to get in touch or collaborate
 
-## Expanding the ESLint configuration
+The goal of this site is to provide a clear picture of my **competency, experience, and growth** as a developer.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠 Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+This portfolio is built as a **static site** using modern web technologies:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **React (TypeScript)** – component-based UI development
+- **Tailwind CSS** – utility-first styling for rapid iteration
+- **Vercel** – deployment and hosting
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📂 Site Sections
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 🔹 About
+A short introduction, background, and areas of interest.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 🔹 Projects
+A curated list of projects that demonstrate:
+- Technical skills
+- Problem-solving ability
+- Real-world application
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Most projects include:
+- 🌍 Live demos
+- 📦 Source code repositories  
+*(Availability depends on the project)*
+
+### 🔹 Involvement
+Community building, organizational roles, and collaborative experiences outside of solo development work.
+
+### 🔹 Awards
+Academic, professional, or community recognitions.
+
+### 🔹 Contact
+Ways to reach me for opportunities, collaboration, or conversation.
+
+## 🚀 Running Locally
+
+If you’d like to run the site locally:
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
