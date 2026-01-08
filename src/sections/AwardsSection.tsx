@@ -12,7 +12,7 @@ import AppconLogo from "../assets/images/appcon_logo.jpg";
 function AwardSection() {
     return (
         <section id="awards-section" className="scroll-mt-24 flex justify-center items-center">
-            <div className="pb-[5rem] mx-10 w-full md:max-w-[1000px] flex flex-col items-center">
+            <div className="pb-[5rem] md:pb-[10rem] mx-10 w-full md:max-w-[1000px] flex flex-col items-center">
                 <SectionLabel activeIcon={AwardLoop} inactiveIcon={AwardStatic} title="highlighted achievements"/>
                 <p className="font-chakra title text-light font-bold text-center mt-2">Awards & Recognitions</p>
 

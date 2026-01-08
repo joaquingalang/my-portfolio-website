@@ -6,7 +6,7 @@ import ProfileStatic from "../assets/images/profile_static.png";
 function AboutSection() {
     return (
         <section id="about-section" className="min-h-[20rem] flex justify-center items-center">
-            <div className="my-[5rem] sm:my-0 mx-10 w-full md:max-w-[1000px] grid grid-cols-8">
+            <div className="my-[5rem] md:my-[10rem] sm:my-0 mx-10 w-full md:max-w-[1000px] grid grid-cols-8">
 
                 <div className="col-span-8 flex flex-col gap-3 justify-center items-center">
 
