@@ -1,17 +1,11 @@
 import RotatingText from "../components/RotatingText";
-import AnimatedIconButton from "../components/AnimatedIconButton";
-import GitHubLoop from "../assets/images/github_loop.gif";
-import GitHubStatic from "../assets/images/github_static.png";
-import LinkedInLoop from "../assets/images/linkedin_loop.gif";
-import LinkedInStatic from "../assets/images/linkedin_static.png";
-import EmailLoop from "../assets/images/email_loop.gif";
-import EmailStatic from "../assets/images/email_static.png";
+import SocialLinks from "../components/SocialLinks";
 import JoaquinProfile from "../assets/images/joaquin_profile.png";
 
 function HeroSection() {
     return (
         <section id="landing-section" className="pt-5 min-h-[80vh] flex justify-center items-center">
-            
+
             <div className="my-[5rem] sm:my-0 mx-10 w-full md:max-w-[1000px] grid grid-cols-8">
 
                 <div className="col-span-8 sm:col-span-3 border border-transparent flex justify-center md:justify-end">
@@ -40,8 +34,8 @@ function HeroSection() {
                     </h1>
 
                     <div className="flex gap-[10px] mt-2 md:mt-4 justify-center md:justify-start items-center">
-                        
-                        <a 
+
+                        <a
                             href="https://drive.google.com/file/d/1EwVW_YXibQH2VvfNaptXbqtXi5SQX04_/view?usp=sharing"
                             target="_blank"
                             className="bg-white/10 text-primary border-2 border-gray rounded-full px-6 py-2 md:px-[30px] md:py-[10px] transition-colors duration-300 hover:bg-primary hover:text-dark hover:border-primary"
@@ -49,23 +43,7 @@ function HeroSection() {
                             <p className="font-poppins text-sm md:text-base whitespace-nowrap">Download CV</p>
                         </a>
 
-                        <AnimatedIconButton 
-                            activeLogo={GitHubLoop} 
-                            inactiveLogo={GitHubStatic} 
-                            href="https://github.com/joaquingalang"
-                            target="_blank"
-                        />
-                        <AnimatedIconButton 
-                            activeLogo={LinkedInLoop} 
-                            inactiveLogo={LinkedInStatic} 
-                            href="https://www.linkedin.com/in/joaquin-galang/"
-                            target="_blank"
-                        />
-                        <AnimatedIconButton 
-                            activeLogo={EmailLoop} 
-                            inactiveLogo={EmailStatic} 
-                            href="mailto:galang.joaquin.dev@email.com"
-                        />
+                        <SocialLinks />
 
                         <hr className="hidden md:flex border rounded-full border-light flex-grow overflow"/>
 

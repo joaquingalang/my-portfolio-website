@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import emailjs from "emailjs-com";
+import { emailjsConfig } from "../config/env";
 
 function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -11,35 +12,28 @@ function ContactForm() {
 
     setIsSending(true);
 
-    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-    // Grab form data manually
     const formData = new FormData(formRef.current);
     const fullName = formData.get("full_name") as string;
     const email = formData.get("email") as string;
     const message = formData.get("message") as string;
 
-    // Add time
     const time = new Date().toLocaleString("en-US", {
       hour: "numeric",
       minute: "numeric",
       hour12: true,
     });
 
-    // Send via EmailJS
     emailjs
       .send(
-        serviceId,
-        templateId,
+        emailjsConfig.serviceId,
+        emailjsConfig.templateId,
         {
           name: fullName,
           email: email,
           time: time,
           message: message,
         },
-        publicKey
+        emailjsConfig.publicKey
       )
       .then(
         () => {
@@ -59,7 +53,6 @@ function ContactForm() {
       onSubmit={handleSubmit}
       className="w-full max-w-lg mx-auto flex flex-col"
     >
-      {/* Full Name */}
       <label className="font-chakra text-light text-sm md:text-base lg:text-lg font-medium mb-1">
         Full Name
       </label>
@@ -71,7 +64,6 @@ function ContactForm() {
         className="w-full font-poppins text-sm md:text-base lg:text-lg text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-5 rounded-md"
       />
 
-      {/* Email */}
       <label className="font-chakra text-light text-sm md:text-base lg:text-lg font-medium mb-1">
         Email Address
       </label>
@@ -83,7 +75,6 @@ function ContactForm() {
         className="w-full font-poppins text-sm md:text-base lg:text-lg text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-5 rounded-md"
       />
 
-      {/* Message */}
       <label className="font-chakra text-light text-sm md:text-base lg:text-lg font-medium mb-1">
         Message
       </label>
@@ -94,7 +85,6 @@ function ContactForm() {
         className="w-full min-h-[15rem] font-poppins text-sm md:text-base lg:text-lg text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-5 rounded-md resize-none"
       />
 
-      {/* Submit Button */}
       <div className="w-full flex justify-end">
         <button
           type="submit"

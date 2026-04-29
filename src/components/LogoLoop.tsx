@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { cn } from '../utils/cn';
 
 export type LogoItem =
   | {
@@ -42,8 +43,6 @@ const ANIMATION_CONFIG = {
 
 const toCssLength = (value?: number | string): string | undefined =>
   typeof value === 'number' ? `${value}px` : (value ?? undefined);
-
-const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
 const useResizeObserver = (
   callback: () => void,
@@ -243,7 +242,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
 
     const rootClasses = useMemo(
       () =>
-        cx(
+        cn(
           'relative overflow-x-hidden group',
           '[--logoloop-gap:32px]',
           '[--logoloop-logoHeight:28px]',
@@ -269,7 +268,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
 
         const content = isNodeItem ? (
           <span
-            className={cx(
+            className={cn(
               'inline-flex items-center',
               'motion-reduce:transition-none',
               scaleOnHover &&
@@ -281,7 +280,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
           </span>
         ) : (
           <img
-            className={cx(
+            className={cn(
               'h-[var(--logoloop-logoHeight)] w-auto block object-contain',
               '[-webkit-user-drag:none] pointer-events-none',
               '[image-rendering:-webkit-optimize-contrast]',
@@ -308,7 +307,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
 
         const inner = (item as any).href ? (
           <a
-            className={cx(
+            className={cn(
               'inline-flex items-center no-underline rounded',
               'transition-opacity duration-200 ease-linear',
               'hover:opacity-80',
@@ -327,7 +326,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
 
         return (
           <li
-            className={cx(
+            className={cn(
               'flex-none mr-[var(--logoloop-gap)] text-[length:var(--logoloop-logoHeight)] leading-[1]',
               scaleOnHover && 'overflow-visible group/item'
             )}
@@ -380,7 +379,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
           <>
             <div
               aria-hidden
-              className={cx(
+              className={cn(
                 'pointer-events-none absolute inset-y-0 left-0 z-[1]',
                 'w-[clamp(24px,8%,120px)]',
                 'bg-[linear-gradient(to_right,var(--logoloop-fadeColor,var(--logoloop-fadeColorAuto))_0%,rgba(0,0,0,0)_100%)]'
@@ -388,7 +387,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
             />
             <div
               aria-hidden
-              className={cx(
+              className={cn(
                 'pointer-events-none absolute inset-y-0 right-0 z-[1]',
                 'w-[clamp(24px,8%,120px)]',
                 'bg-[linear-gradient(to_left,var(--logoloop-fadeColor,var(--logoloop-fadeColorAuto))_0%,rgba(0,0,0,0)_100%)]'
@@ -398,7 +397,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
         )}
 
         <div
-          className={cx('flex w-max will-change-transform select-none', 'motion-reduce:transform-none')}
+          className={cn('flex w-max will-change-transform select-none', 'motion-reduce:transform-none')}
           ref={trackRef}
         >
           {logoLists}

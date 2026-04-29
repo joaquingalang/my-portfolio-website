@@ -7,10 +7,7 @@ import {
   type Target,
   type TargetAndTransition
 } from 'motion/react';
-
-function cn(...classes: (string | undefined | null | boolean)[]): string {
-  return classes.filter(Boolean).join(' ');
-}
+import { cn } from '../utils/cn';
 
 export interface RotatingTextRef {
   next: () => void;
