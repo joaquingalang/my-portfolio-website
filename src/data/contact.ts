@@ -16,7 +16,6 @@ export const iconCloudSlugs: string[] = [
   "supabase",
   "cloudflare",
   "google",
-  "c#",
   "tailwindcss",
   "mongodb",
   "mysql",
@@ -26,4 +25,5 @@ export const iconCloudSlugs: string[] = [
   "slack",
   "stackoverflow",
   "netlify",
+  "claude",
 ];
