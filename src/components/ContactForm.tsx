@@ -5,6 +5,7 @@ import { emailjsConfig } from "../config/env";
 function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [isSending, setIsSending] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,11 +38,11 @@ function ContactForm() {
       )
       .then(
         () => {
-          console.log("Email sent!");
+          setStatus("success");
           formRef.current?.reset();
         },
-        (error) => {
-          console.error("EmailJS Error:", error);
+        () => {
+          setStatus("error");
         }
       )
       .finally(() => setIsSending(false));
@@ -85,6 +86,13 @@ function ContactForm() {
         className="w-full min-h-[15rem] font-poppins text-sm md:text-base lg:text-lg text-light bg-gray px-3 pb-1 pt-2 outline-none placeholder-light/10 mb-5 rounded-md resize-none"
       />
 
+      {status === "success" && (
+        <p className="font-poppins text-sm text-green-400 mb-3">Message sent! I'll get back to you soon.</p>
+      )}
+      {status === "error" && (
+        <p className="font-poppins text-sm text-red-400 mb-3">Something went wrong. Please try again.</p>
+      )}
+
       <div className="w-full flex justify-end">
         <button
           type="submit"
@@ -92,6 +100,7 @@ function ContactForm() {
           className={`bg-white/10 border-2 border-gray rounded-lg px-5 py-2 font-poppins text-sm md:text-base lg:text-lg text-primary whitespace-nowrap transition ${
             isSending ? "opacity-60 cursor-not-allowed" : "hover:opacity-80"
           }`}
+          onClick={() => setStatus("idle")}
         >
           {isSending ? "Sending..." : "Send Message"}
         </button>
