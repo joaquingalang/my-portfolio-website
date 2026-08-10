@@ -2,41 +2,112 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-slideDown {
-  animation: slideDown .2s ease-out;
-}
-
 @layer base {
+  :root {
+    /* Space the fixed navbar actually occupies, measured from the top of the
+       viewport: 20px `mt-5` + the StarBorder pill. The mobile pill is taller
+       because its trigger holds a 44px touch target.
+         mobile  20 + (44 + 28 padding + 2 border + 2 outer) = 96px
+         >= sm   20 + (32 + 28 padding + 2 border + 2 outer) = 84px
+       Everything that has to clear the navbar derives from this one value
+       rather than being hand-tuned per place. */
+    --nav-offset: 6rem;
+
+    /* Half the gap between two adjacent sections, so every section carries the
+       same padding block and any pairing lands on the same rhythm. */
+    --section-pad: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --nav-offset: 5.25rem;
+    }
+  }
+
   html {
     scroll-behavior: smooth;
-  } 
+    /* Anchor targets land below the navbar with a little breathing room. */
+    scroll-padding-top: calc(var(--nav-offset) + 1.5rem);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-dark text-light;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* One focus indicator for the whole site. Never removed, only restyled. */
+  :focus-visible {
+    outline: 2px solid theme("colors.primary");
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: theme("colors.primary");
+    color: theme("colors.dark");
+  }
+
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
   textarea:-webkit-autofill,
   textarea:-webkit-autofill:hover,
   textarea:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset !important; /* match your bg color */
-    -webkit-text-fill-color: #ffffff !important; /* match your text color */
+    -webkit-box-shadow: 0 0 0px 1000px theme("colors.surface") inset !important;
+    -webkit-text-fill-color: theme("colors.light") !important;
+    caret-color: theme("colors.light");
     transition: background-color 9999s ease-in-out 0s;
+  }
+
+  /* Users who ask for less motion get none of the ambient/decorative kind.
+     Transitions are collapsed rather than removed so state changes stay legible. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
 @layer utilities {
+  /* Fluid display + body scales. Replaces the old three-step breakpoint jumps so
+     type grows continuously instead of snapping at 768/1024px. */
   .title {
-    @apply text-3xl md:text-4xl lg:text-5xl;
+    font-size: clamp(1.875rem, 1.225rem + 2.77vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
   }
 
   .subtitle {
-    @apply text-sm md:text-base lg:text-lg;
+    font-size: clamp(0.875rem, 0.731rem + 0.62vw, 1.125rem);
+    line-height: 1.65;
+  }
+
+  /* Comfortable measure for running text (~65 characters). */
+  .measure {
+    max-width: 65ch;
+  }
+
+  .section-shell {
+    @apply mx-auto w-full max-w-[1000px] px-6 sm:px-8;
+  }
+
+  /* Symmetric block padding on every content section. Adjacent sections then
+     always sit exactly one `--section-pad * 2` apart, instead of the previous
+     mix of bottom-only and top-and-bottom rules. */
+  .section-y {
+    padding-top: var(--section-pad);
+    padding-bottom: var(--section-pad);
   }
 }
