@@ -12,34 +12,44 @@ function HomePage() {
     return (
         <div className="bg-dark">
 
+            {/* Visible only once focused — lets keyboard users jump the navbar. */}
+            <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:bg-primary focus:px-5 focus:py-2 focus:font-poppins focus:text-sm focus:font-medium focus:text-dark"
+            >
+                Skip to content
+            </a>
+
             {/* Navigation Bar */}
             <NavBar/>
 
-            {/* Landing Section */}
-            <HeroSection/>
+            <main id="main-content">
 
-            {/* Tech Tools (Logo Loop) */}
-            <SkillSection/>
+                {/* Landing Section */}
+                <HeroSection/>
 
-            {/* About Section */}
-            <AboutSection/>
+                {/* Tech Tools (Logo Loop) */}
+                <SkillSection/>
 
-            {/* Project Section */}
-            <ProjectSection/>
-            
+                {/* About Section */}
+                <AboutSection/>
 
-            {/* Involvement Section (Scroll Stack) */}
-            <InvolvementSection/>
+                {/* Project Section */}
+                <ProjectSection/>
 
-            {/* Awards Section */}
-            <AwardSection/>
+                {/* Involvement Section */}
+                <InvolvementSection/>
 
-            {/* Contact Section (Icon Cloud) */}
-            <ContactSection/>
+                {/* Awards Section */}
+                <AwardSection/>
+
+                {/* Contact Section (Icon Cloud) */}
+                <ContactSection/>
+
+            </main>
 
             {/* Footer */}
             <Footer/>
-
 
         </div>
     );
