@@ -2,6 +2,7 @@
 
 import { type ElementType, useEffect, useRef, useState, createElement, useMemo, useCallback } from 'react';
 import { gsap } from 'gsap';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface TextTypeProps {
   className?: string;
@@ -52,6 +53,7 @@ const TextType = ({
   const [isVisible, setIsVisible] = useState(!startOnVisible);
   const cursorRef = useRef<HTMLSpanElement>(null);
   const containerRef = useRef<HTMLElement>(null);
+  const prefersReduced = useReducedMotion();
 
   const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
 
@@ -85,6 +87,7 @@ const TextType = ({
   }, [startOnVisible]);
 
   useEffect(() => {
+    if (prefersReduced) return;
     if (showCursor && cursorRef.current) {
       gsap.set(cursorRef.current, { opacity: 1 });
       gsap.to(cursorRef.current, {
@@ -95,10 +98,11 @@ const TextType = ({
         ease: 'power2.inOut'
       });
     }
-  }, [showCursor, cursorBlinkDuration]);
+  }, [showCursor, cursorBlinkDuration, prefersReduced]);
 
   useEffect(() => {
     if (!isVisible) return;
+    if (prefersReduced) return;
 
     let timeout: ReturnType<typeof setTimeout>;
 
@@ -164,11 +168,28 @@ const TextType = ({
     isVisible,
     reverseMode,
     variableSpeed,
-    onSentenceComplete
+    onSentenceComplete,
+    prefersReduced
   ]);
 
   const shouldHideCursor =
     hideCursorWhileTyping && (currentCharIndex < textArray[currentTextIndex].length || isDeleting);
+
+  // Skip the keystroke-by-keystroke reveal entirely and present the finished
+  // copy — the text is content, not decoration, so it must still be there.
+  if (prefersReduced) {
+    return createElement(
+      Component,
+      {
+        ref: containerRef,
+        className: `inline-block whitespace-pre-wrap tracking-tight ${className}`,
+        ...props
+      },
+      <span className="inline" style={{ color: getCurrentTextColor() || 'inherit' }}>
+        {textArray[currentTextIndex]}
+      </span>
+    );
+  }
 
   return createElement(
     Component,
