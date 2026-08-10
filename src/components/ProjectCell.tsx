@@ -1,5 +1,19 @@
 import CodeIcon from "../assets/images/code_icon.svg";
 import NorthEastIcon from "../assets/images/arrow_north_east_icon.svg";
+import { cn } from "../utils/cn";
+
+const TILE_CLASS =
+    "relative z-10 flex h-11 w-11 items-center justify-center rounded-xl bg-light/10 " +
+    "transition-[background-color,transform] duration-200 ease-out-quart " +
+    "hover:-translate-y-0.5 hover:bg-primary hover:[&_img]:brightness-0 md:h-[52px] md:w-[52px]";
+
+function ProjectLink({ href, icon, label }: { href: string; icon: string; label: string }) {
+    return (
+        <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className={TILE_CLASS}>
+            <img src={icon} alt="" className="w-5 md:w-6" />
+        </a>
+    );
+}
 
 export interface Props {
     imagePath: string;
@@ -10,53 +24,67 @@ export interface Props {
 }
 
 function ProjectCell({ imagePath, title, desc, codeLink, projLink }: Props) {
-    return (
-        <div className="col-span-8 sm:col-span-4">
-            <img
-                src={imagePath}
-                className="object-cover rounded-2xl w-full h-[12.5rem] lg:h-[20rem] flex justify-between mt-2"
-            />
+    // The card reads as one target: the title link is stretched across the whole
+    // cell, with the icon buttons layered above it for their specific destinations.
+    const primaryLink = projLink ?? codeLink;
 
-            <div className="flex justify-between mt-5">
-                <div>
-                    <p className="font-poppins text-light text-xl lg:text-3xl font-medium">
-                        {title}
-                    </p>
-                    <p className="font-chakra text-light/50 text-xs md:text-sm lg:text-base font-extralight">
+    // Grid placement is owned by the wrapping <Reveal> in ProjectSection.
+    return (
+        <article className="group relative">
+
+            <div className="overflow-hidden rounded-2xl bg-surface">
+                <img
+                    src={imagePath}
+                    alt={`${title} — ${desc}`}
+                    loading="lazy"
+                    decoding="async"
+                    width={1920}
+                    height={1080}
+                    /* Source art is 16:9, so the ratio is exact — the box is
+                       reserved before decode and nothing is cropped. */
+                    className="aspect-video w-full object-cover transition-transform duration-500 ease-out-quart group-hover:scale-[1.04] motion-reduce:transform-none"
+                />
+            </div>
+
+            <div className="mt-5 flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                    <h3 className="font-poppins text-xl font-medium text-light transition-colors duration-200 group-hover:text-primary md:text-2xl">
+                        {primaryLink ? (
+                            <a
+                                href={primaryLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="after:absolute after:inset-0 after:rounded-2xl after:content-['']"
+                            >
+                                {title}
+                            </a>
+                        ) : (
+                            title
+                        )}
+                    </h3>
+                    <p className="mt-1 font-chakra text-xs font-light text-light/60 md:text-sm lg:text-base">
                         {desc}
                     </p>
                 </div>
 
-                {/* Buttons */}
-                <div className="flex gap-2 md:gap-3">
-                    {/* Code Button */}
-                    <a
-                        href={codeLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`bg-light/10 rounded-md sm:rounded-lg md:rounded-xl flex justify-center items-center w-[40px] h-[40px] sm:w-[48px] sm:h-[48px] md:w-[60px] md:h-[60px] ${codeLink && "transition-transform duration-300 hover:scale-110"}`}
-                    >
-                        <img
-                            src={CodeIcon}
-                            className={`w-[1.25rem] sm:w-[1.75rem] md:w-[2rem] ${codeLink ?? "opacity-10"}`}
+                <div className={cn("flex shrink-0 gap-2 md:gap-3")}>
+                    {codeLink && (
+                        <ProjectLink
+                            href={codeLink}
+                            icon={CodeIcon}
+                            label={`View source code for ${title}`}
                         />
-                    </a>
-
-                    {/* Project Button */}
-                    <a
-                        href={projLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`bg-light/10 rounded-md sm:rounded-lg md:rounded-xl flex justify-center items-center w-[40px] h-[40px] sm:w-[48px] sm:h-[48px] md:w-[60px] md:h-[60px] ${projLink && "transition-transform duration-300 hover:scale-110"}`}
-                    >
-                        <img
-                            src={NorthEastIcon}
-                            className={`w-[1.25rem] sm:w-[1.75rem] md:w-[2rem] ${projLink ?? "opacity-10"}`}
+                    )}
+                    {projLink && (
+                        <ProjectLink
+                            href={projLink}
+                            icon={NorthEastIcon}
+                            label={`Open live demo for ${title}`}
                         />
-                    </a>
+                    )}
                 </div>
             </div>
-        </div>
+        </article>
     );
 }
 
