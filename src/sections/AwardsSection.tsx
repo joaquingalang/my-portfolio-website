@@ -1,19 +1,35 @@
-import SectionLabel from "../components/SectionLabel";
+import SectionHeading from "../components/SectionHeading";
+import Reveal from "../components/Reveal";
 import AwardLoop from "../assets/images/awards_loop.gif";
-import AwardStatic from "../assets/images/awards_static.png";
+import AwardStatic from "../assets/images/awards_static.webp";
 import AwardCard from "../components/AwardCard";
 import { awards } from "../data/awards";
 
 function AwardSection() {
     return (
-        <section id="awards-section" className="scroll-mt-24 flex justify-center items-center">
-            <div className="pb-[5rem] md:pb-[10rem] mx-10 w-full md:max-w-[1000px] flex flex-col items-center">
-                <SectionLabel activeIcon={AwardLoop} inactiveIcon={AwardStatic} title="highlighted achievements"/>
-                <p className="font-chakra title text-light font-bold text-center mt-2">Awards & Recognitions</p>
+        <section
+            id="awards-section"
+            aria-labelledby="awards-heading"
+            className="flex items-center justify-center section-y"
+        >
+            <div className="section-shell">
 
-                <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-[3rem]">
+                <SectionHeading
+                    id="awards-heading"
+                    eyebrow="highlighted achievements"
+                    activeIcon={AwardLoop}
+                    inactiveIcon={AwardStatic}
+                    title="Awards & Recognitions"
+                    lede="Competitions and programmes where the work was put in front of judges."
+                />
+
+                {/* Was 1 column until lg, which left tablets with one enormous
+                    column and a lot of dead space. */}
+                <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
                     {awards.map((award, i) => (
-                        <AwardCard key={i} {...award} />
+                        <Reveal key={award.title} delay={i * 90} className="h-full">
+                            <AwardCard {...award} />
+                        </Reveal>
                     ))}
                 </div>
             </div>
