@@ -1,9 +1,9 @@
-import TrashTrackr from '../assets/images/trashtrackr.png';
-import PaperProof from '../assets/images/paperproof.png';
-import Pamagsalin from '../assets/images/pamagsalin.png';
-import AiCon from '../assets/images/aicon.png';
-import Compass from '../assets/images/compass.png';
-import GdscHau from '../assets/images/gdsc_hau.png';
+import TrashTrackr from '../assets/images/trashtrackr.webp';
+import PaperProof from '../assets/images/paperproof.webp';
+import Pamagsalin from '../assets/images/pamagsalin.webp';
+import AiCon from '../assets/images/aicon.webp';
+import Compass from '../assets/images/compass.webp';
+import GdscHau from '../assets/images/gdsc_hau.webp';
 
 export interface ProjectData {
   imagePath: string;
