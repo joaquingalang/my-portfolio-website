@@ -31,12 +31,13 @@
 
 .inner-content {
   position: relative;
-  border: 1px solid #222;
-  background: #000;
-  color: white;
+  /* Tinted near-black rather than #000, matching the page base. */
+  border: 1px solid rgba(246, 247, 255, 0.08);
+  background: #0b0b0d;
+  color: #f6f7ff;
   font-size: 16px;
   text-align: center;
-  padding: 16px 26px;
+  padding: 14px 24px;
   border-radius: 20px;
   z-index: 1;
 }
@@ -60,5 +61,16 @@
   100% {
     transform: translate(100%, 0%);
     opacity: 0;
+  }
+}
+
+/* Ambient decoration only — settle it into a static hairline glow instead of
+   looping forever for users who asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .border-gradient-bottom,
+  .border-gradient-top {
+    animation: none;
+    opacity: 0.25;
+    transform: none;
   }
 }
