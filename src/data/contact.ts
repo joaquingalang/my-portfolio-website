@@ -1,3 +1,9 @@
+/**
+ * Single source of truth for the public contact address. Imported by the social
+ * icon row and the contact form's failure message so the two can never drift.
+ */
+export const CONTACT_EMAIL = "galang.joaquin.dev@gmail.com";
+
 export const iconCloudSlugs: string[] = [
   "typescript",
   "javascript",
