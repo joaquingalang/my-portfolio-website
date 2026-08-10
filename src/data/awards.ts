@@ -2,7 +2,7 @@ import BuildWithAiPhoto from '../assets/images/build_with_ai.jpg';
 import SolchaPhoto from '../assets/images/solcha.jpg';
 import AppconPhoto from '../assets/images/appcon.jpg';
 import GdgUpmLogo from '../assets/images/gdg_upm_logo.jpg';
-import GoogleLogo from '../assets/images/google_logo.png';
+import GoogleLogo from '../assets/images/google_logo.webp';
 import AppconLogo from '../assets/images/appcon_logo.jpg';
 
 export interface AwardData {
