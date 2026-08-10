@@ -13,34 +13,35 @@ type StarBorderProps<T extends React.ElementType> = React.ComponentPropsWithoutR
 const StarBorder = <T extends React.ElementType = 'button'>({
   as,
   className = '',
-  color = 'white',
+  color = '#60e08e',
   speed = '6s',
   thickness = 1,
   children,
   ...rest
 }: StarBorderProps<T>) => {
-  const Component = as || 'button';
+  const Component = (as || 'button') as React.ElementType;
+  const { style, ...domProps } = rest as { style?: React.CSSProperties } & Record<string, unknown>;
 
   return (
     <Component
       className={`star-border-container ${className}`}
-      {...(rest as any)}
+      {...domProps}
       style={{
         padding: `${thickness}px 0`,
-        ...(rest as any).style
+        ...style
       }}
     >
       <div
         className="border-gradient-bottom"
         style={{
-          background: `radial-gradient(circle, #60e08e, transparent 10%)`,
+          background: `radial-gradient(circle, ${color}, transparent 10%)`,
           animationDuration: speed
         }}
       ></div>
       <div
         className="border-gradient-top"
         style={{
-          background: `radial-gradient(circle, #60e08e, transparent 10%)`,
+          background: `radial-gradient(circle, ${color}, transparent 10%)`,
           animationDuration: speed
         }}
       ></div>
