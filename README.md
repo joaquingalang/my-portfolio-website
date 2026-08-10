@@ -84,5 +84,8 @@ If you’d like to run the site locally:
 # Install dependencies
 npm install
 
+# Configure the contact form (EmailJS)
+cp .env.example .env   # then fill in the values
+
 # Start development server
 npm run dev
