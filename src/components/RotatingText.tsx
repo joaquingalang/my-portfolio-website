@@ -8,6 +8,7 @@ import {
   type TargetAndTransition
 } from 'motion/react';
 import { cn } from '../utils/cn';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 export interface RotatingTextRef {
   next: () => void;
@@ -65,6 +66,7 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
     ref
   ) => {
     const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
+    const prefersReduced = useReducedMotion();
 
     const splitIntoCharacters = (text: string): string[] => {
       if (typeof Intl !== 'undefined' && Intl.Segmenter) {
@@ -170,10 +172,18 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
     );
 
     useEffect(() => {
-      if (!auto) return;
+      // An indefinitely looping word is exactly the kind of ambient motion the
+      // reduced-motion preference is meant to stop.
+      if (!auto || prefersReduced) return;
       const intervalId = setInterval(next, rotationInterval);
       return () => clearInterval(intervalId);
-    }, [next, rotationInterval, auto]);
+    }, [next, rotationInterval, auto, prefersReduced]);
+
+    if (prefersReduced) {
+      return (
+        <span className={cn('inline-flex', mainClassName)}>{texts[currentTextIndex]}</span>
+      );
+    }
 
     return (
       <motion.span
