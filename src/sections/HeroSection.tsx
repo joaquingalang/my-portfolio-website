@@ -1,27 +1,61 @@
 import RotatingText from "../components/RotatingText";
 import SocialLinks from "../components/SocialLinks";
-import JoaquinProfile from "../assets/images/joaquin_profile.png";
+import Button from "../components/Button";
+import JoaquinProfile from "../assets/images/joaquin_profile.webp";
+
+const CV_URL =
+    "https://drive.google.com/file/d/1EwVW_YXibQH2VvfNaptXbqtXi5SQX04_/view?usp=sharing";
 
 function HeroSection() {
     return (
-        <section id="landing-section" className="pt-5 min-h-[80vh] flex justify-center items-center">
+        <section
+            id="landing-section"
+            aria-labelledby="hero-heading"
+            /* Top padding clears the navbar, which also shifts the flex centring
+               down by the same amount — so the content is optically centred in
+               the space *below* the navbar rather than in the whole viewport,
+               which is what made it sit high before. `svh` keeps mobile stable
+               when the browser chrome collapses. */
+            className="flex min-h-[88svh] items-center justify-center pt-[calc(var(--nav-offset)+1rem)] pb-[var(--section-pad)]"
+        >
+            <div className="section-shell grid grid-cols-8 items-center gap-y-6">
 
-            <div className="my-[5rem] sm:my-0 mx-10 w-full md:max-w-[1000px] grid grid-cols-8">
-
-                <div className="col-span-8 sm:col-span-3 border border-transparent flex justify-center md:justify-end">
-
-                    <img src={JoaquinProfile} className="p-10 max-h-[475px] object-contain"/>
-
+                <div className="col-span-8 flex justify-center sm:col-span-3 sm:justify-end">
+                    {/* Intrinsic size declared so the tallest above-the-fold image
+                        reserves its box before decode (no CLS), and prioritised
+                        because it is the LCP candidate. */}
+                    <img
+                        src={JoaquinProfile}
+                        alt="Portrait of Joaquin Galang"
+                        width={1200}
+                        height={1628}
+                        fetchPriority="high"
+                        decoding="async"
+                        className="max-h-[420px] w-auto object-contain px-4 sm:px-2 md:px-6"
+                    />
                 </div>
 
-                <div className="col-span-8 sm:col-span-5 flex flex-col justify-center border border-transparent">
+                <div className="col-span-8 flex flex-col justify-center sm:col-span-5">
 
-                    <p className="font-poppins text-light text-md md:text-lg font-light mb-2 text-center sm:text-start">Hi, I'm Quin. </p>
-                    <h1 className="font-sarpanch text-light text-3xl md:text-4xl lg:text-5xl font-bold m-0 text-center sm:text-start">
-                        <span className="mr-3">A full-stack developer building</span>
+                    <p className="mb-2 text-center font-poppins text-base font-light text-light/70 sm:text-start md:text-lg">
+                        Hi, I&rsquo;m Quin.
+                    </p>
+
+                    <h1
+                        id="hero-heading"
+                        className="m-0 text-center font-sarpanch title font-bold text-light sm:text-start"
+                    >
+                        <span className="mr-3">A software developer building</span>
                         <RotatingText
-                            texts={['frontend', 'backend', 'mobile', 'experiences']}
-                            mainClassName="inline-block font-sarpanch text-light text-3xl md:text-4xl lg:text-5xl font-bold px-2 md:px-3 bg-primary my-1 py-1 lg:py-2 justify-center rounded-lg overflow-hidden"
+                            /* Leads on "automations" — the differentiator, and also
+                               what the reduced-motion render pins to, so the static
+                               sentence is the strongest one. First and last entries
+                               are both 11 characters, keeping the chip's width
+                               travel symmetric across the loop. */
+                            texts={["automations", "frontend", "backend", "experiences"]}
+                            /* text-dark on mint: ~11.5:1. The previous text-light
+                               on mint measured ~1.6:1 and was effectively unreadable. */
+                            mainClassName="inline-block font-sarpanch title font-bold text-dark px-2 md:px-3 bg-primary my-1 py-1 lg:py-2 justify-center rounded-lg overflow-hidden"
                             staggerFrom={"last"}
                             initial={{ y: "100%" }}
                             animate={{ y: 0 }}
@@ -33,21 +67,30 @@ function HeroSection() {
                         />
                     </h1>
 
-                    <div className="flex gap-[10px] mt-2 md:mt-4 justify-center md:justify-start items-center">
+                    <div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:justify-start md:mt-8">
 
-                        <a
-                            href="https://drive.google.com/file/d/1EwVW_YXibQH2VvfNaptXbqtXi5SQX04_/view?usp=sharing"
+                        <Button as="a" href="#projects-section" variant="primary">
+                            View my work
+                        </Button>
+
+                        <Button
+                            as="a"
+                            href={CV_URL}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-white/10 text-primary border-2 border-gray rounded-full px-6 py-2 md:px-[30px] md:py-[10px] transition-colors duration-300 hover:bg-primary hover:text-dark hover:border-primary"
+                            variant="secondary"
                         >
-                            <p className="font-poppins text-sm md:text-base whitespace-nowrap">Download CV</p>
-                        </a>
+                            Download CV
+                        </Button>
 
+                    </div>
+
+                    <div className="mt-5 flex items-center justify-center gap-3 sm:justify-start">
                         <SocialLinks />
-
-                        <hr className="hidden md:flex border rounded-full border-light flex-grow overflow"/>
-
+                        <hr
+                            aria-hidden="true"
+                            className="ml-2 hidden flex-grow border-0 border-t border-light/15 sm:block"
+                        />
                     </div>
                 </div>
             </div>
