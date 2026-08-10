@@ -1,20 +1,39 @@
 export interface Props {
     imagePath: string;
+    organization: string;
     position: string;
     term: string;
     desc: string;
 }
 
-function InvolvementTile({ imagePath, position, term, desc }: Props) {
+function InvolvementTile({ imagePath, organization, position, term, desc }: Props) {
     return (
-        <div className="grid grid-cols-12 mb-5">
-            <img src={imagePath} className="col-span-2 rounded-full"/>
-            <div className="col-span-10 h-full flex flex-col justify-center ml-[2rem]">
-                <p className="font-chakra text-light text-lg sm:text-xl font-semibold">{position}</p>
-                <p className="font-poppins text-light/50 text-xs sm:text-sm font-light mb-1">{term}</p>
-                <p className="font-poppins text-light text-xs sm:text-sm max-w-[50rem]">{desc}</p>
+        <article className="group flex gap-4 sm:gap-6">
+            {/* Fixed square box: the source marks are not all the same ratio, so
+                object-cover on a locked aspect keeps the circle from squashing them. */}
+            <img
+                src={imagePath}
+                alt={`${organization} logo`}
+                loading="lazy"
+                decoding="async"
+                className="h-14 w-14 shrink-0 rounded-full object-cover ring-1 ring-light/10 transition-[transform,box-shadow] duration-300 ease-out-quart group-hover:-translate-y-0.5 group-hover:ring-primary/40 sm:h-16 sm:w-16"
+            />
+
+            <div className="min-w-0">
+                <h3 className="font-chakra text-lg font-semibold text-light sm:text-xl">
+                    {position}
+                </h3>
+                <p className="font-poppins text-xs font-medium text-primary sm:text-sm">
+                    {organization}
+                </p>
+                <p className="mb-2 font-poppins text-xs font-light text-light/55 sm:text-sm">
+                    {term}
+                </p>
+                <p className="font-poppins text-xs text-light/80 sm:text-sm measure">
+                    {desc}
+                </p>
             </div>
-        </div>
+        </article>
     );
 }
 
