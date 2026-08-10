@@ -1,31 +1,53 @@
 import SectionLabel from "../components/SectionLabel";
 import TextType from "../components/TextType";
+import Reveal from "../components/Reveal";
 import ProfileLoop from "../assets/images/profile_loop.gif";
-import ProfileStatic from "../assets/images/profile_static.png";
+import ProfileStatic from "../assets/images/profile_static.webp";
+
+const ABOUT_TEXT =
+    "I build mobile and web apps with Flutter, React, Firebase, and Node.js, along with automation workflows in N8N that connect systems and cut out manual work. I like taking an idea and turning it into something people actually use.";
 
 function AboutSection() {
     return (
-        <section id="about-section" className="min-h-[20rem] flex justify-center items-center">
-            <div className="my-[5rem] md:my-[10rem] sm:my-0 mx-10 w-full md:max-w-[1000px] grid grid-cols-8">
+        <section
+            id="about-section"
+            aria-labelledby="about-heading"
+            className="flex items-center justify-center section-y"
+        >
+            <div className="section-shell">
+                <h2 id="about-heading" className="sr-only">
+                    About me
+                </h2>
 
-                <div className="col-span-8 flex flex-col gap-3 justify-center items-center">
+                <Reveal className="flex flex-col items-center gap-5">
 
-                    <SectionLabel title="about me" activeIcon={ProfileLoop} inactiveIcon={ProfileStatic}/>
+                    <SectionLabel activeIcon={ProfileLoop} inactiveIcon={ProfileStatic} title="about me" />
 
-                    <TextType 
-                    text={["Hi, I’m Joaquin — a developer passionate about crafting clean, intuitive, and impactful digital experiences. I build across mobile and web using Flutter, React, Firebase, and Node.js, and I love turning ideas into real products that solve problems and bring people joy"]}
-                    typingSpeed={5}
-                    pauseDuration={1500}
-                    showCursor={true}
-                    cursorCharacter="_"
-                    className="font-poppins text-light text-md md:text-lg lg:text-xl text-center max-w-[60rem]"
-                    />
+                    {/* A copy of the finished text holds the exact final height while
+                        the typewriter runs, so the section never reflows mid-animation. */}
+                    <div className="relative measure text-center">
+                        <p
+                            aria-hidden="true"
+                            className="invisible font-poppins text-base tracking-tight text-light md:text-lg"
+                        >
+                            {ABOUT_TEXT}
+                            <span className="ml-1">_</span>
+                        </p>
 
-                </div>
+                        <TextType
+                            text={[ABOUT_TEXT]}
+                            typingSpeed={12}
+                            startOnVisible
+                            loop={false}
+                            showCursor
+                            cursorCharacter="_"
+                            className="absolute inset-0 font-poppins text-base text-light md:text-lg"
+                        />
+                    </div>
 
+                </Reveal>
             </div>
-            
-        </section>        
+        </section>
     );
 }
 
