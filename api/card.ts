@@ -16,7 +16,7 @@
  * `src/index.css` deliberately; if those change, change them here too.
  */
 import { waitUntil } from '@vercel/functions';
-import { recordEvent } from './_lib/analytics';
+import { recordEvent } from './_lib/analytics.js';
 import {
   EMAIL,
   FULL_NAME,
@@ -27,9 +27,7 @@ import {
   WHATSAPP_URL,
   isSurface,
   type Surface,
-} from './_lib/profile';
-
-export const config = { runtime: 'edge' };
+} from './_lib/profile.js';
 
 const escapeHtml = (value: string): string =>
   value.replace(/[&<>"']/g, (char) => {
@@ -281,7 +279,7 @@ function renderCard(surface: Surface): string {
 </html>`;
 }
 
-export default function handler(request: Request): Response {
+function handler(request: Request): Response {
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return new Response('Method Not Allowed', {
       status: 405,
@@ -311,3 +309,10 @@ export default function handler(request: Request): Response {
     },
   });
 }
+
+/**
+ * Node runtime (Fluid compute), not Edge: Vercel now recommends it, and it is
+ * what lets the function be pinned to Singapore near the people scanning the
+ * card. The `fetch` Web Standard export is the signature /api expects.
+ */
+export default { fetch: handler };

@@ -34,8 +34,9 @@ await esbuild.build({
 });
 
 const load = (name) => import(pathToFileURL(resolve(outdir, `${name}.mjs`)));
-const card = (await load('card')).default;
-const vcard = (await load('vcard')).default;
+// The functions export the `fetch` Web Standard shape the Node runtime expects.
+const card = (await load('card')).default.fetch;
+const vcard = (await load('vcard')).default.fetch;
 const { isNoise, recordEvent } = await load('analytics');
 
 const IPHONE =

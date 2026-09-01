@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["sin1"],
   "rewrites": [
     { "source": "/c", "destination": "/api/card?s=c" },
     { "source": "/e", "destination": "/api/card?s=e" },

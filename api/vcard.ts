@@ -8,8 +8,8 @@
  * vCard 3.0, not 4.0: 3.0 is what iOS and Android both handle without argument.
  */
 import { waitUntil } from '@vercel/functions';
-import { recordEvent } from './_lib/analytics';
-import { PHOTO_JPEG_BASE64 } from './_lib/photo';
+import { recordEvent } from './_lib/analytics.js';
+import { PHOTO_JPEG_BASE64 } from './_lib/photo.js';
 import {
   EMAIL,
   FIRST_NAME,
@@ -20,9 +20,7 @@ import {
   TITLE,
   isSurface,
   type Surface,
-} from './_lib/profile';
-
-export const config = { runtime: 'edge' };
+} from './_lib/profile.js';
 
 /** Escaping for text-typed values only. URI and TEL values are passed through. */
 const escapeText = (value: string): string =>
@@ -71,7 +69,7 @@ function buildVCard(): string {
   return lines.map(fold).join('\r\n') + '\r\n';
 }
 
-export default function handler(request: Request): Response {
+function handler(request: Request): Response {
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return new Response('Method Not Allowed', {
       status: 405,
@@ -101,3 +99,5 @@ export default function handler(request: Request): Response {
     },
   });
 }
+
+export default { fetch: handler };

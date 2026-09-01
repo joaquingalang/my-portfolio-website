@@ -12,7 +12,7 @@
  * and it must stay outside consent-banner territory for a page someone has open
  * for eight seconds.
  */
-import type { Surface } from './profile';
+import type { Surface } from './profile.js';
 
 /**
  * `visit` is a page load; `save` is an actual .vcf download — the number that

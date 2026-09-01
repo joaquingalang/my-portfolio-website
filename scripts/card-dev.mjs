@@ -68,7 +68,7 @@ const server = createServer(async (req, res) => {
       alias: { '@vercel/functions': stub }, logLevel: 'warning',
     });
     const mod = await import(pathToFileURL(resolve(outdir, `${route.name}-${stamp}.mjs`)));
-    const response = await mod.default(
+    const response = await mod.default.fetch(
       new Request(`https://joaquingalang.dev/api/${route.name}${route.search}`, {
         method: req.method,
         headers: req.headers,

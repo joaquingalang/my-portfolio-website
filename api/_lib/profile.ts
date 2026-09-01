@@ -6,7 +6,7 @@
  * the intent of `src/data/contact.ts`, which the email address is imported from
  * rather than re-declared.
  */
-import { CONTACT_EMAIL } from '../../src/data/contact';
+import { CONTACT_EMAIL } from '../../src/data/contact.js';
 
 /** The surfaces the card is printed on. Same page, separate analytics identity. */
 export type Surface = 'c' | 'e';
