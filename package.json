@@ -7,9 +7,14 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "card": "node scripts/card-dev.mjs",
+    "card:test": "node scripts/card-test.mjs",
+    "stats": "node scripts/stats.mjs"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/functions": "^3.9.5",
     "autoprefixer": "^10.4.21",
     "emailjs-com": "^3.2.0",
     "gsap": "^3.13.0",

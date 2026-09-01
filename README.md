@@ -89,3 +89,117 @@ cp .env.example .env   # then fill in the values
 
 # Start development server
 npm run dev
+
+```
+
+## Calling Card (`/c` and `/e`)
+
+The short-path landing page the QR code on the printed calling card resolves to.
+Its one job is getting contact details saved into the scanner's phone.
+
+| Path | Purpose |
+|---|---|
+| `/c` | The calling card. This is the URL that goes on print. |
+| `/e` | Event handouts and standees. Same page, separate analytics identity. |
+| `/c/contact.vcf`, `/e/contact.vcf` | The vCard, generated per request. |
+
+Paths are kept this short on purpose: a shorter URL means a lower-density QR,
+which matters when the code is printed at ~2 cm. For the same reason the surfaces
+are separated by path, never by UTM query params — query strings inflate density
+and some scanners strip them.
+
+### How it is built
+
+Unlike the rest of the site, these are **not** React routes. The site is a static
+SPA with no router and no server, which cannot satisfy two of the requirements:
+the page must be readable before JS runs, and a visit must count even with
+JavaScript disabled. So `vercel.json` rewrites both paths to Vercel Edge
+Functions that return a complete HTML document and record the visit during the
+request.
+
+```
+vercel.json          rewrites /c, /e and the .vcf paths onto the functions
+api/card.ts          renders the page
+api/vcard.ts         generates the vCard 3.0 file
+api/_lib/profile.ts  name, title, email, phone, links — single source of truth
+api/_lib/analytics.ts server-side visit counter
+api/_lib/photo.ts    the portrait, base64, for the vCard PHOTO property
+```
+
+The palette and type in `api/card.ts` are copied from `.impeccable.md` rather
+than imported, so **if the design tokens change, change them there too.**
+
+### Local preview
+
+`npm run dev` serves the SPA but knows nothing about `/api`, so the card is
+invisible to it. Use:
+
+```bash
+npm run card     # http://localhost:4321/c
+```
+
+It applies the real rewrites from `vercel.json` and rebuilds on every request.
+
+Checks for the parts that fail silently — vCard formatting, the bot filter, and
+the guarantee that a dead analytics store cannot take the page down:
+
+```bash
+npm run card:test
+```
+
+It cannot cover how a real iPhone or Android handles the `.vcf`; that has to be
+done by hand on a preview deployment.
+
+### Analytics
+
+Two layers, answering different questions.
+
+**Layer 1 — server-side counter.** Runs during the request, before any client JS,
+so it counts scans that ad blockers and privacy browsers would hide. Stored in
+Upstash Redis as a sorted set scored by timestamp (`visits:c`, `visits:e`,
+`saves:c`, `saves:e`), so "how many, and on which days" is one query. No cookies,
+no IP addresses, no raw user-agents — a counter, not a profile, and deliberately
+outside consent-banner territory. Link-preview bots, crawlers, prefetches and
+`HEAD` requests are filtered out. **A failed write never affects the page.**
+
+**Layer 2 — Vercel Web Analytics.** Referrers, country, device. Mounted in
+`src/main.tsx` for the SPA and loaded directly on the card page, plus a
+`save_contact` custom event on the Save contact tap. This layer is blockable, so
+treat it as texture rather than volume.
+
+Read both back from the terminal:
+
+```bash
+npm run stats                # last 30 days
+npm run stats -- --days 7
+npm run stats -- --fresh     # bypass the 1-hour Vercel API cache
+```
+
+### Setup
+
+1. Add the **Upstash Redis** integration to the Vercel project (Marketplace). It
+   provisions `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+2. Enable **Web Analytics** on the Vercel project, or layer 2 collects nothing.
+3. For local `npm run stats`, copy the variables into `.env` — see
+   `.env.example`. The Vercel token is account-scoped and is **not** `VITE_`
+   prefixed on purpose: Vite inlines every `VITE_*` variable into the client
+   bundle, and this one must never reach a browser.
+
+### Card assets
+
+`public/card/joaquin.webp` (page avatar) and the base64 blob in
+`api/_lib/photo.ts` (vCard photo) are both generated from a square headshot:
+
+```bash
+python -c "
+from PIL import Image
+import base64, io, textwrap
+src = Image.open('headshot.png').convert('RGB')
+src.resize((320, 320), Image.LANCZOS).save('public/card/joaquin.webp', 'WEBP', quality=82, method=6)
+buf = io.BytesIO(); src.resize((192, 192), Image.LANCZOS).save(buf, 'JPEG', quality=72, optimize=True)
+print(base64.b64encode(buf.getvalue()).decode())
+"
+```
+
+Keep the vCard photo small — a bloated `.vcf` makes iOS slow to open the Add
+Contact sheet, which is the one interaction that must not stall.
