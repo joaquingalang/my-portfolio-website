@@ -94,6 +94,9 @@ npm run dev
 
 ## Calling Card (`/c` and `/e`)
 
+> Remaining launch steps — domain, analytics, device testing — are tracked in
+> [`CARD_LAUNCH.md`](./CARD_LAUNCH.md).
+
 The short-path landing page the QR code on the printed calling card resolves to.
 Its one job is getting contact details saved into the scanner's phone.
 
