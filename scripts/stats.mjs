@@ -109,6 +109,85 @@ async function layerOne() {
       .forEach(([host, count]) => console.log(`  ${String(count).padStart(5)}  ${host}`));
   }
   console.log('');
+
+  // Handed to the leads section so the fill rate is measured against the same
+  // window, rather than against a second query that could disagree with it.
+  return { visitsInWindow: windows[0].length + windows[1].length };
+}
+
+// ---------------------------------------------------------------------------
+// Leads — who actually said who they were.
+// ---------------------------------------------------------------------------
+
+async function leads(counts) {
+  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+
+  if (!url || !token) {
+    console.log('  (no Redis credentials in .env — skipping)\n');
+    return;
+  }
+
+  const response = await fetch(`${url}/pipeline`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify([
+      ['LRANGE', 'leads:c', '0', '-1'],
+      ['LRANGE', 'leads:e', '0', '-1'],
+    ]),
+  });
+
+  if (!response.ok) {
+    console.log(`  Redis error ${response.status}: ${await response.text()}\n`);
+    return;
+  }
+
+  const results = await response.json();
+  const all = ['c', 'e'].flatMap((surface, i) =>
+    (results[i].result ?? []).map((raw) => {
+      try {
+        return { surface, ...JSON.parse(raw) };
+      } catch {
+        return null;
+      }
+    }),
+  ).filter(Boolean);
+
+  const recent = all.filter((lead) => lead.ts >= since).sort((a, b) => b.ts - a.ts);
+
+  if (!recent.length) {
+    console.log(`  no leads in the last ${days} days (${all.length} all time)\n`);
+    return;
+  }
+
+  // The number the gate is judged on: it costs saves, and this is what it buys.
+  if (counts?.visitsInWindow) {
+    const rate = Math.round((recent.length / counts.visitsInWindow) * 100);
+    console.log(`  ${recent.length} of ${counts.visitsInWindow} scans said who they were — ${rate}%\n`);
+  } else {
+    console.log(`  ${recent.length} in the last ${days} days, ${all.length} all time\n`);
+  }
+
+  for (const lead of recent) {
+    const day = new Date(lead.ts).toISOString().slice(0, 10);
+    console.log(`  ${day}  ${lead.name}  (/${lead.surface}, ${lead.device})`);
+    const where = [lead.met, (lead.intent ?? []).join(', ')].filter(Boolean).join('  ·  ');
+    if (where) console.log(`              ${where}`);
+    if (lead.reach) console.log(`              ${lead.reach}`);
+    if (lead.note) console.log(`              "${lead.note}"`);
+    console.log('');
+  }
+
+  // Worth knowing which pitch is landing, once there are enough to see a shape.
+  const tally = new Map();
+  recent.forEach((lead) => (lead.intent ?? []).forEach((i) => tally.set(i, (tally.get(i) ?? 0) + 1)));
+  if (tally.size) {
+    console.log('  what they came for');
+    [...tally.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([label, count]) => console.log(`  ${String(count).padStart(5)}  ${label}`));
+    console.log('');
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -144,6 +223,9 @@ async function layerTwo() {
   const results = {};
 
   const queries = {
+    // Note: since the gate shipped, one scanner produces two /c pageviews here
+    // — the gate and the reveal. Layer 1 counts only the gate, so use it, not
+    // this, for volume.
     'visits by day (/c)': ['visits/aggregate', { by: 'day', filter: "requestPath eq '/c'" }],
     'visits by country (/c)': ['visits/aggregate', { by: 'country', filter: "requestPath eq '/c'" }],
     'visits by referrer (/c)': ['visits/aggregate', { by: 'referrerHostname', filter: "requestPath eq '/c'" }],
@@ -182,6 +264,8 @@ async function layerTwo() {
 
 console.log(`\nCalling card — last ${days} days\n`);
 console.log('Layer 1 — server-side counter (trusted)\n');
-await layerOne();
+const counts = await layerOne();
+console.log('Leads — the gate form\n');
+await leads(counts);
 console.log('Layer 2 — Vercel Web Analytics (texture)\n');
 await layerTwo();

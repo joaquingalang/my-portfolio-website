@@ -18,9 +18,11 @@ Background on how any of it works is in the **Calling Card** section of
 | ✅ | `/c` and `/e` live, functions running in `sin1` (Singapore) |
 | ✅ | vCard served with correct `Content-Type` and `Content-Disposition` |
 | ✅ | Server-side counter writing to Upstash (`visits:c`, `visits:e`, `saves:c`, `saves:e`) |
+| ✅ | Gate form on both surfaces, writing to `leads:c` / `leads:e` |
 | ⬜ | Apex domain still redirects to `www` |
 | ⬜ | Vercel Web Analytics not enabled |
 | ⬜ | Not yet tested on a real iPhone / Android |
+| ⬜ | Gate's reveal redirect not yet verified on a deployment |
 | ⬜ | Counter still contains test hits |
 
 ---
@@ -77,20 +79,44 @@ VERCEL_TEAM_ID=team_iz70zua8XzMAeAUXQk3IcD17
 > EmailJS values went missing. `npm run stats` reads `.env.local` first, so a
 > pull can never clobber the token.
 
-## 4. Test on real phones — the gate
+## 4. Test on real phones — nothing ships until this passes
 
 Nothing else can substitute for this. The headers and bytes are verified
 correct, but whether iOS actually offers to add the contact is only observable
 on a physical device.
 
-Open <https://joaquingalang.dev/c> on **an iPhone (Safari)** and **an Android
-(Chrome)**, then tap **Save contact**.
+First, one check that can be done from a terminal. The form's reveal relies on
+Vercel merging the incoming query string into the rewrite's, so that `/c?v=1`
+reaches the function as `?s=c&v=1`. That is documented behaviour and the local
+preview reproduces it, but it has never run on a deployment — and if it were
+wrong, submitting the form would silently loop back to the form. It is verified
+in one line:
 
-- ✅ The native *Add Contact* sheet opens, showing name, title, photo, number
-- ❌ A wall of `BEGIN:VCARD` text means the headers are not reaching the browser
+```bash
+curl -s "https://joaquingalang.dev/c?v=1" | grep -c "contact.vcf"
+```
 
-Also check, one-handed and outdoors if you can: the photo loads, the green
-button is comfortably tappable, and Email and WhatsApp open the right apps.
+`1` or more means the reveal works. `0` means it does not, and nothing below is
+worth doing until it does.
+
+Then, on **an iPhone (Safari)** and **an Android (Chrome)**, open
+<https://joaquingalang.dev/c>:
+
+1. The form appears first. Fill in a name and tap **Continue** — you should land
+   on the card, not back on the form.
+2. Tap **Save contact**.
+   - ✅ The native *Add Contact* sheet opens, showing name, title, photo, number
+   - ❌ A wall of `BEGIN:VCARD` text means the headers are not reaching the browser
+3. Go back to <https://joaquingalang.dev/c> and tap **Skip** instead. Same card,
+   no form.
+
+Watch for two things the desktop cannot show you: whether tapping into the name
+field makes iOS zoom the page in and refuse to zoom back out (the inputs are
+16px specifically to prevent that), and whether the whole form fits a
+one-handed scroll without feeling like paperwork.
+
+Also check, outdoors if you can: the photo loads, the green button is
+comfortably tappable, and Email and WhatsApp open the right apps.
 
 **Do not print anything until this passes on both.**
 
@@ -102,8 +128,11 @@ so your first real numbers mean something.
 **Vercel → Storage → `card-analytics` → Data Browser**, then:
 
 ```
-DEL visits:c visits:e saves:c saves:e
+DEL visits:c visits:e saves:c saves:e leads:c leads:e
 ```
+
+`leads:*` holds the gate submissions, including any you made yourself while
+testing step 4 — and unlike the counters, those have your own name on them.
 
 Confirm it is clean:
 
@@ -150,8 +179,21 @@ drop a share of it. It knows country, browser, OS and device.
 When they disagree, **layer 1 is right** — layer 2 reading lower is the expected
 behaviour and the entire reason layer 1 exists.
 
-The ratio worth watching is `saves:c ÷ visits:c`. If people are scanning but not
-saving, the page has a problem worth fixing.
+> Since the gate shipped, one scanner produces **two** `/c` pageviews in layer 2
+> — the form and the card behind it. Layer 1 counts only the form, so it stays
+> the number to quote. Do not read volume off layer 2.
+
+`npm run stats` also prints every gate submission: who, where you met, what they
+came for, how to reach them, and anything they asked you to remember.
+
+### The two numbers to actually watch
+
+**`saves:c ÷ visits:c`** — did the card do its job. This is the one the gate puts
+at risk, so compare it against what it was before the form existed. If it has
+fallen further than the names are worth, the gate is the thing to remove.
+
+**leads ÷ `visits:c`** — what the gate bought you, printed for you by
+`npm run stats` as *"N of M scans said who they were"*.
 
 For ad-hoc queries, the Upstash Data Browser takes raw Redis:
 
@@ -159,6 +201,8 @@ For ad-hoc queries, the Upstash Data Browser takes raw Redis:
 ZCARD visits:c                       # total scans ever
 ZCOUNT visits:c 1767225600000 +inf   # scans since an epoch-ms timestamp
 ZRANGE visits:c -20 -1               # the 20 most recent, raw
+LLEN leads:c                         # how many people said who they were
+LRANGE leads:c -5 -1                 # the five most recent submissions
 ```
 
 ---

@@ -98,12 +98,14 @@ npm run dev
 > [`CARD_LAUNCH.md`](./CARD_LAUNCH.md).
 
 The short-path landing page the QR code on the printed calling card resolves to.
-Its one job is getting contact details saved into the scanner's phone.
+Its one job is getting contact details saved into the scanner's phone — and,
+since the gate was added, learning who the scanner was on the way.
 
 | Path | Purpose |
 |---|---|
 | `/c` | The calling card. This is the URL that goes on print. |
 | `/e` | Event handouts and standees. Same page, separate analytics identity. |
+| `/c?v=1`, `/e?v=1` | The contact details, past the gate. Never printed — see below. |
 | `/c/contact.vcf`, `/e/contact.vcf` | The vCard, generated per request. |
 
 Paths are kept this short on purpose: a shorter URL means a lower-density QR,
@@ -131,6 +133,44 @@ api/_lib/photo.ts    the portrait, base64, for the vCard PHOTO property
 
 The palette and type in `api/card.ts` are copied from `.impeccable.md` rather
 than imported, so **if the design tokens change, change them there too.**
+
+### The gate
+
+Both surfaces open on a short form — name, where we met, what you're here for,
+how to reach you, anything to remember — and the contact details sit behind it.
+Only the name is required, and there is a Skip link straight to the card.
+
+That is a deliberate trade. It costs some share of the saves in exchange for
+knowing who the scan was, which is why `saves:c ÷ visits:c` is worth watching
+either side of a change to it — see [`CARD_LAUNCH.md`](./CARD_LAUNCH.md).
+
+It is **a real `<form method="post">`, not a JavaScript reveal.** That is not a
+stylistic preference: the reason this page is a function rather than a React
+route is that it has to work before and without JS, and a client-side gate would
+throw that away — script blocked would mean no form, or worse, no card. Three
+server-rendered states:
+
+```
+GET  /c          the gate
+POST /c          record the lead, then 303 to the card
+GET  /c?v=1      the card
+```
+
+`?v=1` is set by the Skip link and by that redirect, **never by the QR code** —
+the printed URL stays bare `/c`, which is what keeps the code low-density. It
+survives the rewrite because Vercel merges the incoming query string into the
+destination's; `scripts/card-dev.mjs` reproduces that so the local preview
+behaves the same way.
+
+Two details worth knowing before editing:
+
+- **Only the gate counts as a visit.** Counting the reveal as well would double
+  every number in `visits:*` and quietly break the ratio above.
+- **The dropdown and checkbox values are validated against
+  `api/_lib/profile.ts`** and discarded if they do not match, so those two
+  fields can never hold anything a stranger typed. A honeypot field and a
+  "faster than a person can type" check drop bot submissions silently — they
+  still get the normal redirect, so they cannot tell.
 
 ### Local preview
 
@@ -168,7 +208,17 @@ outside consent-banner territory. Link-preview bots, crawlers, prefetches and
 **Layer 2 — Vercel Web Analytics.** Referrers, country, device. Mounted in
 `src/main.tsx` for the SPA and loaded directly on the card page, plus a
 `save_contact` custom event on the Save contact tap. This layer is blockable, so
-treat it as texture rather than volume.
+treat it as texture rather than volume — and note that the gate makes one
+scanner produce two `/c` pageviews here, which is another reason not to read
+volume off it.
+
+**Leads — the gate form.** A separate pair of keys, `leads:c` and `leads:e`, and
+a different kind of data: a name and a contact address somebody chose to type,
+rather than anything observed. Kept under its own keys on purpose — the counters
+above are anonymous by construction, and joining the two would quietly turn one
+into a profile. Deleting `leads:c` costs you no scan counts. Same failure
+contract as layer 1: never blocks the response, and a dead store loses the lead
+rather than the page.
 
 Read both back from the terminal:
 

@@ -47,16 +47,34 @@ async function bundle() {
 /** Rewrites are read from vercel.json so this can never drift from production. */
 const rewrites = JSON.parse(await readFile(resolve(root, 'vercel.json'), 'utf8')).rewrites;
 
-function match(pathname) {
-  const rule = rewrites.find((r) => r.source === pathname);
+/**
+ * Vercel merges the incoming query string into the destination's, and the gate
+ * depends on it: `/c?v=1` has to reach the function as `?s=c&v=1`. Reproducing
+ * that here is what lets the local preview get past the form at all.
+ */
+function match(url) {
+  const rule = rewrites.find((r) => r.source === url.pathname);
   if (!rule) return null;
-  const url = new URL(rule.destination, 'http://local');
-  return { name: url.pathname.replace('/api/', ''), search: url.search };
+  const dest = new URL(rule.destination, 'http://local');
+  for (const [key, value] of url.searchParams) {
+    // The destination's own params win — `?s=` decides the surface and must not
+    // be settable from the address bar.
+    if (!dest.searchParams.has(key)) dest.searchParams.append(key, value);
+  }
+  return { name: dest.pathname.replace('/api/', ''), search: dest.search };
+}
+
+/** The gate posts a form, so unlike the first version of this script the body has to survive. */
+async function readBody(req) {
+  if (req.method === 'GET' || req.method === 'HEAD') return undefined;
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  return Buffer.concat(chunks);
 }
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
-  const route = match(url.pathname);
+  const route = match(url);
 
   if (route) {
     // Rebuild per request so edits show up on refresh.
@@ -68,10 +86,19 @@ const server = createServer(async (req, res) => {
       alias: { '@vercel/functions': stub }, logLevel: 'warning',
     });
     const mod = await import(pathToFileURL(resolve(outdir, `${route.name}-${stamp}.mjs`)));
+
+    // Hop-by-hop headers describe this connection, not the request — fetch
+    // rejects some of them outright and recomputes the rest from the body.
+    const headers = { ...req.headers };
+    for (const name of ['connection', 'content-length', 'transfer-encoding', 'host']) {
+      delete headers[name];
+    }
+
     const response = await mod.default.fetch(
       new Request(`https://joaquingalang.dev/api/${route.name}${route.search}`, {
         method: req.method,
-        headers: req.headers,
+        headers,
+        body: await readBody(req),
       }),
     );
     res.writeHead(response.status, Object.fromEntries(response.headers));

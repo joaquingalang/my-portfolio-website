@@ -11,6 +11,12 @@
  * anything else that could identify a person. This is a counter, not a profile,
  * and it must stay outside consent-banner territory for a page someone has open
  * for eight seconds.
+ *
+ * `recordLead` at the bottom of this file is the one exception, and it is a
+ * different thing wearing the same plumbing: a name and a contact address that
+ * somebody chose to type into a form. Volunteered rather than observed, stored
+ * under its own keys, and never joined to the counters above — see the note
+ * there before changing it.
  */
 import type { Surface } from './profile.js';
 
@@ -130,6 +136,79 @@ export function recordEvent(
     () => undefined,
     (error: unknown) => {
       console.error(`[card] ${kind} not recorded:`, error);
+    },
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Leads — the gate form. Everything above this line is anonymous counting.
+// ---------------------------------------------------------------------------
+
+/**
+ * One submitted gate form. Every field is optional except `name`, and the two
+ * list-backed fields have already been checked against `MET_OPTIONS` and
+ * `INTENT_OPTIONS` by the caller, so nothing here is free text a stranger typed
+ * except `name`, `reach` and `note` — all three length-capped at the boundary.
+ */
+export interface Lead {
+  name: string;
+  met: string;
+  intent: string[];
+  reach: string;
+  note: string;
+}
+
+/**
+ * Appends one lead to `leads:c` / `leads:e`.
+ *
+ * A list, not the sorted set the counters use: leads are read in full and in
+ * order rather than counted within a window, and two people submitting in the
+ * same millisecond must both survive — which is exactly the case a sorted set
+ * dedupes away.
+ *
+ * Kept under separate keys from `visits:*` and `saves:*` on purpose. Those are
+ * anonymous by construction; this is identifiable by definition, and the two
+ * being joinable would quietly turn the counter into a profile. Deleting
+ * `leads:c` must never cost you a scan count, and it does not.
+ *
+ * Same failure contract as `recordEvent`: never throws, never blocks the
+ * response, and a dead store loses the lead rather than the page.
+ */
+export function recordLead(
+  request: Request,
+  surface: Surface,
+  lead: Lead,
+): Promise<void> {
+  const creds = credentials();
+  if (!creds) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[card] no Redis credentials; lead not recorded');
+    }
+    return Promise.resolve();
+  }
+
+  const ua = request.headers.get('user-agent') ?? '';
+  const record = {
+    ts: Date.now(),
+    ...lead,
+    // The same two coarse fields the counter keeps, for the same reason: enough
+    // to tell an event scan from a desk one, useless for identifying anybody.
+    device: deviceClass(ua),
+    ref: referrerHost(request.headers.get('referer')),
+  };
+
+  return fetch(creds.url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${creds.token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(['RPUSH', `leads:${surface}`, JSON.stringify(record)]),
+    signal: AbortSignal.timeout(2000),
+  }).then(
+    () => undefined,
+    (error: unknown) => {
+      console.error('[card] lead not recorded:', error);
     },
   );
 }

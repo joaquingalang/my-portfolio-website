@@ -49,6 +49,50 @@ export const PHONE_E164 = '+639156175207';
 /** wa.me wants the E.164 digits with no punctuation and no leading plus. */
 export const WHATSAPP_URL = `https://wa.me/${PHONE_E164.replace(/\D/g, '')}`;
 
+/**
+ * The gate's "I met Joaquin at" options.
+ *
+ * Deliberately short. Every entry is somewhere a card of yours plausibly
+ * changes hands, and a list long enough to scroll turns a one-tap field into a
+ * decision — which is the opposite of what a page with a thirty-second budget
+ * needs. Ordered most to least specific so the person who has a precise answer
+ * finds it before reading to the bottom.
+ */
+export const MET_OPTIONS = [
+  'A conference or meetup',
+  'A hackathon',
+  'A job fair',
+  'A client meeting',
+  'We just ran into each other',
+  'Someone passed it on',
+  'Found it online',
+] as const;
+
+/**
+ * Intent, not flattery.
+ *
+ * An earlier draft asked what the scanner liked about Joaquin, which asks a
+ * stranger to form an opinion they have not had time to form and returns
+ * something unactionable. This asks the only question the form exists to
+ * answer: who is worth replying to first, and about what.
+ */
+export const INTENT_OPTIONS = [
+  'Hiring',
+  'A project I need built',
+  'Collaborating',
+  'Advice or mentorship',
+  'Just connecting',
+] as const;
+
+/**
+ * True only for strings this file wrote. Everything arriving from the form is
+ * checked against the lists above before it is stored, so the two select-style
+ * fields can never hold anything a stranger typed — only an index into a list
+ * that lives here.
+ */
+export const isKnown = (list: readonly string[], value: string): boolean =>
+  list.includes(value);
+
 export interface CardLink {
   label: string;
   href: string;
