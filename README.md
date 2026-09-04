@@ -94,9 +94,6 @@ npm run dev
 
 ## Calling Card (`/c` and `/e`)
 
-> Remaining launch steps — domain, analytics, device testing — are tracked in
-> [`CARD_LAUNCH.md`](./CARD_LAUNCH.md).
-
 The short-path landing page the QR code on the printed calling card resolves to.
 Its one job is getting contact details saved into the scanner's phone — and,
 since the gate was added, learning who the scanner was on the way.
@@ -142,7 +139,7 @@ Only the name is required, and there is a Skip link straight to the card.
 
 That is a deliberate trade. It costs some share of the saves in exchange for
 knowing who the scan was, which is why `saves:c ÷ visits:c` is worth watching
-either side of a change to it — see [`CARD_LAUNCH.md`](./CARD_LAUNCH.md).
+either side of a change to it.
 
 It is **a real `<form method="post">`, not a JavaScript reveal.** That is not a
 stylistic preference: the reason this page is a function rather than a React
