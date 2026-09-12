@@ -42,7 +42,8 @@ const load = (name) => import(pathToFileURL(resolve(outdir, `${name}.mjs`)));
 const card = (await load('card')).default.fetch;
 const vcard = (await load('vcard')).default.fetch;
 const { isNoise, recordEvent } = await load('analytics');
-const { shouldRedirectHomeToCard, GATE_COOKIE, HOME_SOURCE_COOKIE } = await load('misprint');
+const { shouldRedirectHomeToCard, homeRedirectLocation, GATE_COOKIE, HOME_SOURCE_COOKIE } =
+  await load('misprint');
 
 const IPHONE =
   'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
@@ -136,10 +137,10 @@ console.log('\n/c card — past the gate');
 const rc = await card(req('https://joaquingalang.dev/api/card?s=c&v=1'));
 const hc = await rc.text();
 ok('200', rc.status === 200);
-ok('skip sets the seen-the-form cookie',
-  (rc.headers.get('set-cookie') ?? '').includes(`${GATE_COOKIE}=1`));
-ok('the reveal writes localStorage so the homepage script can see it',
-  hc.includes("localStorage.setItem('cg', '1')"));
+ok('skip does not set the answered-the-form cookie',
+  !rc.headers.get('set-cookie')?.includes(`${GATE_COOKIE}=`));
+ok('skip does not write localStorage, so the next scan still hits the gate',
+  !hc.includes('localStorage.setItem'));
 ok('save contact is present', hc.includes('>Save contact<'));
 ok('save contact is a plain anchor (works with JS off)',
   /<a class="cta"[^>]*href="\/c\/contact\.vcf"[^>]*download=/.test(hc));
@@ -168,8 +169,22 @@ const rOk = await post('c', { name: 'Maria Santos', t: UNHURRIED() });
 ok('303, so a refresh cannot re-submit', rOk.status === 303);
 ok('lands on the card', rOk.headers.get('location') === '/c?v=1');
 ok('never cached', rOk.headers.get('cache-control') === 'no-store');
-ok('a submission sets the seen-the-form cookie',
+ok('a submission sets the answered-the-form cookie',
   (rOk.headers.get('set-cookie') ?? '').includes(`${GATE_COOKIE}=1`));
+const rAnswered = await card(
+  req('https://joaquingalang.dev/api/card?s=c&v=1', {
+    headers: { 'user-agent': IPHONE, cookie: `${GATE_COOKIE}=1` },
+  }),
+);
+ok('the card after a submit writes localStorage for the homepage script',
+  (await rAnswered.text()).includes("localStorage.setItem('cg', '1')"));
+const rBareAnswered = await card(
+  req('https://joaquingalang.dev/api/card?s=c', {
+    headers: { 'user-agent': IPHONE, cookie: `${GATE_COOKIE}=1` },
+  }),
+);
+ok('bare /c with the cookie skips the gate',
+  rBareAnswered.status === 302 && rBareAnswered.headers.get('location') === '/c?v=1');
 
 const rNoName = await post('c', { name: '   ', reach: 'a@b.com', t: UNHURRIED() });
 ok('a blank name re-renders the gate', rNoName.status === 422);
@@ -348,12 +363,22 @@ ok('a www→apex hop is sent to /c',
     'sec-fetch-site': 'same-site',
     referer: 'https://www.joaquingalang.dev/',
   }));
-ok('the seen-the-form cookie stops a second redirect',
-  !home({
+ok('a phone that already submitted still leaves / for the card',
+  home({
     'user-agent': IPHONE,
     'sec-fetch-site': 'none',
     cookie: `${GATE_COOKIE}=1`,
   }));
+ok('…and lands on the card, not the gate',
+  homeRedirectLocation(
+    new Request('https://joaquingalang.dev/', {
+      headers: { 'user-agent': IPHONE, cookie: `${GATE_COOKIE}=1` },
+    }),
+  ) === '/c?v=1');
+ok('a phone that has not submitted is sent to the gate',
+  homeRedirectLocation(
+    new Request('https://joaquingalang.dev/', { headers: { 'user-agent': IPHONE } }),
+  ) === '/c');
 ok('a neighbouring cookie named almost the same does not count',
   home({
     'user-agent': IPHONE,

@@ -36,7 +36,7 @@
  */
 import { waitUntil } from '@vercel/functions';
 import { recordEvent, recordLead, type Lead } from './_lib/analytics.js';
-import { gateCookieHeader } from './_lib/misprint.js';
+import { gateCookieHeader, hasGateCookie } from './_lib/misprint.js';
 import {
   EMAIL,
   FULL_NAME,
@@ -418,7 +418,7 @@ ${body}
 }
 
 /** The contact details. Reached by submitting the gate, or by skipping it. */
-function renderCard(surface: Surface): string {
+function renderCard(surface: Surface, remembered = false): string {
   const links = LINKS.map((link) => {
     // Everything but the portfolio itself leaves the site.
     const external = link.href.startsWith(SITE_URL)
@@ -447,12 +447,15 @@ function renderCard(surface: Surface): string {
 
   <nav class="links" aria-label="Elsewhere">${links}</nav>`;
 
+  const remember = remembered
+    ? `  try { localStorage.setItem('cg', '1'); } catch (e) {}\n`
+    : '';
+
   const script = `
 <script>
   // Progressive enhancement only. The download works identically when this
   // script is blocked, which on a privacy browser it will be.
-  try { localStorage.setItem('cg', '1'); } catch (e) {}
-  document.getElementById('save-contact').addEventListener('click', function () {
+${remember}  document.getElementById('save-contact').addEventListener('click', function () {
     if (window.va) window.va('event', { name: 'save_contact', data: { surface: '${surface}' } });
   });
 </script>`;
@@ -617,8 +620,8 @@ async function handler(request: Request): Promise<Response> {
     if (lead) waitUntil(recordLead(request, surface, lead));
 
     // POST/redirect/GET, so a refresh on the card does not re-submit.
-    // The cookie is what lets the homepage middleware leave this phone alone
-    // on the next visit — they have already seen the gate.
+    // The cookie is the browser flag that they answered the form — Skip
+    // does not set it, so a skip still hits the gate on the next scan.
     return new Response(null, {
       status: 303,
       headers: headers({
@@ -637,6 +640,16 @@ async function handler(request: Request): Promise<Response> {
 
   // Set by the Skip link and by the redirect above — never by the QR code.
   const revealed = url.searchParams.get('v') === '1';
+  const answered = hasGateCookie(request);
+
+  // A later scan of bare `/c` from a browser that already submitted should
+  // not see the form again, and must not count as another visit.
+  if (!revealed && answered) {
+    return new Response(null, {
+      status: 302,
+      headers: headers({ Location: `/${surface}?v=1` }),
+    });
+  }
 
   // Only the gate is a visit. Counting the reveal as well would double every
   // number in `visits:*` and quietly break `saves:c ÷ visits:c`, which is the
@@ -647,15 +660,9 @@ async function handler(request: Request): Promise<Response> {
     waitUntil(recordEvent(request, surface, 'visit'));
   }
 
-  const body = revealed ? renderCard(surface) : renderGate(surface);
+  const body = revealed ? renderCard(surface, answered) : renderGate(surface);
 
-  // Skip is a GET of `?v=1`. Same cookie as the POST above, so either way
-  // past the gate counts as "already seen" for the misprint redirect.
-  return html(
-    request.method === 'HEAD' ? null : body,
-    200,
-    revealed ? { 'Set-Cookie': gateCookieHeader() } : {},
-  );
+  return html(request.method === 'HEAD' ? null : body);
 }
 
 /**

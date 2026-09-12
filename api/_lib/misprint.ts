@@ -2,9 +2,9 @@
  * Temporary workaround for the first print run of the calling card.
  *
  * The QR on those cards encodes `joaquingalang.dev` instead of
- * `joaquingalang.dev/c`. Until that stock is gone, a first-time phone that
- * opens `/` is sent to the gate — header sniffing missed real camera hops —
- * then a first-party cookie remembers they have already been through it.
+ * `joaquingalang.dev/c`. Until that stock is gone, every phone that opens `/`
+ * is sent to `/c`. The gate still asks who they are unless that browser
+ * already submitted the form — then they get the contact card.
  *
  * This is a functional flag, not tracking: the cookie is never written to
  * Redis and never joined to `visits:*` or `leads:*`. The visit counter's "no
@@ -16,7 +16,7 @@
  * Turn off without a deploy: `CARD_MISPRINT_REDIRECT=0`.
  */
 
-/** First-party flag that the gate has already been shown on this browser. */
+/** First-party flag that this browser submitted the gate form. Skip does not set it. */
 export const GATE_COOKIE = 'cg';
 
 const GATE_COOKIE_VALUE = '1';
@@ -90,10 +90,9 @@ function isBotOrPrefetch(request: Request): boolean {
 }
 
 /**
- * True when `/` should 302 to `/c`. Camera header sniffing missed real apex
- * scans, so every first-time phone on `/` is sent to the gate. Matcher in
- * middleware.ts already limits this to `/`; the path and query are checked
- * here so the tests do not have to pretend to be Vercel.
+ * True when `/` should 302 to `/c` (or `/c?v=1` if they already submitted).
+ * Matcher in middleware.ts already limits this to `/`; the path and query
+ * are checked here so the tests do not have to pretend to be Vercel.
  */
 export function shouldRedirectHomeToCard(request: Request): boolean {
   if (process.env.CARD_MISPRINT_REDIRECT === '0') return false;
@@ -102,7 +101,11 @@ export function shouldRedirectHomeToCard(request: Request): boolean {
   const url = new URL(request.url);
   if (url.pathname !== '/' || url.search !== '') return false;
 
-  if (hasGateCookie(request)) return false;
   if (isBotOrPrefetch(request)) return false;
   return isPhone(request.headers.get('user-agent') ?? '');
+}
+
+/** Gate if they have not submitted; the card if they have. */
+export function homeRedirectLocation(request: Request): '/c' | '/c?v=1' {
+  return hasGateCookie(request) ? '/c?v=1' : '/c';
 }
