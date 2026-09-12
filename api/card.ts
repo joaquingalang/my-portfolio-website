@@ -36,6 +36,7 @@
  */
 import { waitUntil } from '@vercel/functions';
 import { recordEvent, recordLead, type Lead } from './_lib/analytics.js';
+import { gateCookieHeader } from './_lib/misprint.js';
 import {
   EMAIL,
   FULL_NAME,
@@ -576,8 +577,15 @@ const headers = (extra: Record<string, string> = {}): Record<string, string> => 
   ...extra,
 });
 
-const html = (body: string | null, status = 200): Response =>
-  new Response(body, { status, headers: headers({ 'Content-Type': 'text/html; charset=utf-8' }) });
+const html = (
+  body: string | null,
+  status = 200,
+  extra: Record<string, string> = {},
+): Response =>
+  new Response(body, {
+    status,
+    headers: headers({ 'Content-Type': 'text/html; charset=utf-8', ...extra }),
+  });
 
 async function handler(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -608,9 +616,14 @@ async function handler(request: Request): Promise<Response> {
     if (lead) waitUntil(recordLead(request, surface, lead));
 
     // POST/redirect/GET, so a refresh on the card does not re-submit.
+    // The cookie is what lets the homepage middleware leave this phone alone
+    // on the next visit — they have already seen the gate.
     return new Response(null, {
       status: 303,
-      headers: headers({ Location: `/${surface}?v=1` }),
+      headers: headers({
+        Location: `/${surface}?v=1`,
+        'Set-Cookie': gateCookieHeader(),
+      }),
     });
   }
 
@@ -635,7 +648,13 @@ async function handler(request: Request): Promise<Response> {
 
   const body = revealed ? renderCard(surface) : renderGate(surface);
 
-  return html(request.method === 'HEAD' ? null : body);
+  // Skip is a GET of `?v=1`. Same cookie as the POST above, so either way
+  // past the gate counts as "already seen" for the misprint redirect.
+  return html(
+    request.method === 'HEAD' ? null : body,
+    200,
+    revealed ? { 'Set-Cookie': gateCookieHeader() } : {},
+  );
 }
 
 /**

@@ -19,6 +19,7 @@
  * there before changing it.
  */
 import type { Surface } from './profile.js';
+import { homeSourceFromRequest } from './misprint.js';
 
 /**
  * `visit` is a page load; `save` is an actual .vcf download — the number that
@@ -188,6 +189,7 @@ export function recordLead(
   }
 
   const ua = request.headers.get('user-agent') ?? '';
+  const via = homeSourceFromRequest(request);
   const record = {
     ts: Date.now(),
     ...lead,
@@ -195,6 +197,9 @@ export function recordLead(
     // to tell an event scan from a desk one, useless for identifying anybody.
     device: deviceClass(ua),
     ref: referrerHost(request.headers.get('referer')),
+    // Set when the scanner arrived via the misprinted-QR homepage redirect.
+    // Omitted otherwise, so a direct `/c` lead stays the same shape as before.
+    ...(via ? { via } : {}),
   };
 
   return fetch(creds.url, {
