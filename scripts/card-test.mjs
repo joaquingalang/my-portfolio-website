@@ -26,9 +26,12 @@ const stub = resolve(outdir, 'functions-stub.mjs');
 await writeFile(stub, 'export function waitUntil(p) { return p; }\n');
 
 await esbuild.build({
-  entryPoints: ['api/card.ts', 'api/vcard.ts', 'api/_lib/analytics.ts'].map((f) =>
-    resolve(root, f),
-  ),
+  entryPoints: [
+    'api/card.ts',
+    'api/vcard.ts',
+    'api/_lib/analytics.ts',
+    'api/_lib/misprint.ts',
+  ].map((f) => resolve(root, f)),
   bundle: true, format: 'esm', platform: 'node', outdir,
   entryNames: '[name]', outExtension: { '.js': '.mjs' },
   alias: { '@vercel/functions': stub }, logLevel: 'warning',
@@ -39,6 +42,7 @@ const load = (name) => import(pathToFileURL(resolve(outdir, `${name}.mjs`)));
 const card = (await load('card')).default.fetch;
 const vcard = (await load('vcard')).default.fetch;
 const { isNoise, recordEvent } = await load('analytics');
+const { shouldRedirectHomeToCard, GATE_COOKIE } = await load('misprint');
 
 const IPHONE =
   'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
@@ -87,6 +91,8 @@ const rg = await card(req('https://joaquingalang.dev/api/card?s=c'));
 const hg = await rg.text();
 ok('200', rg.status === 200);
 ok('serves html', rg.headers.get('content-type') === 'text/html; charset=utf-8');
+ok('gate does not set the seen-the-form cookie',
+  !rg.headers.get('set-cookie')?.includes(`${GATE_COOKIE}=`));
 ok('uncached, so every scan is counted', rg.headers.get('cache-control') === 'no-store');
 ok('is a real form post (works with JS off)',
   /<form class="gate" method="post" action="\/c">/.test(hg));
@@ -127,6 +133,8 @@ console.log('\n/c card — past the gate');
 const rc = await card(req('https://joaquingalang.dev/api/card?s=c&v=1'));
 const hc = await rc.text();
 ok('200', rc.status === 200);
+ok('skip sets the seen-the-form cookie',
+  (rc.headers.get('set-cookie') ?? '').includes(`${GATE_COOKIE}=1`));
 ok('save contact is present', hc.includes('>Save contact<'));
 ok('save contact is a plain anchor (works with JS off)',
   /<a class="cta"[^>]*href="\/c\/contact\.vcf"[^>]*download=/.test(hc));
@@ -155,12 +163,16 @@ const rOk = await post('c', { name: 'Maria Santos', t: UNHURRIED() });
 ok('303, so a refresh cannot re-submit', rOk.status === 303);
 ok('lands on the card', rOk.headers.get('location') === '/c?v=1');
 ok('never cached', rOk.headers.get('cache-control') === 'no-store');
+ok('a submission sets the seen-the-form cookie',
+  (rOk.headers.get('set-cookie') ?? '').includes(`${GATE_COOKIE}=1`));
 
 const rNoName = await post('c', { name: '   ', reach: 'a@b.com', t: UNHURRIED() });
 ok('a blank name re-renders the gate', rNoName.status === 422);
 const hNoName = await rNoName.text();
 ok('…and says so without scolding', hNoName.includes('A name first, then the card is yours.'));
 ok('…and is still a working form', hNoName.includes('<form class="gate"'));
+ok('…and does not set the cookie, so a later scan still hits the gate',
+  !rNoName.headers.get('set-cookie')?.includes(`${GATE_COOKIE}=`));
 
 ok('/e submissions land back on /e',
   (await post('e', { name: 'Maria Santos', t: UNHURRIED() })).headers.get('location') === '/e?v=1');
@@ -272,6 +284,72 @@ for (const [label, ua] of [
 ok('empty user-agent dropped', noise({}));
 ok('HEAD dropped', noise({ 'user-agent': IPHONE }, { method: 'HEAD' }));
 ok('prefetch dropped', noise({ 'user-agent': IPHONE, 'sec-purpose': 'prefetch;prerender' }));
+
+console.log('\nmisprinted QR — / to /c');
+const DESKTOP =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+const GOOGLEBOT_PHONE =
+  'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.94 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
+const ANDROID =
+  'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36';
+const home = (headers = {}, init = {}) =>
+  shouldRedirectHomeToCard(
+    new Request('https://joaquingalang.dev/', { headers, ...init }),
+  );
+
+ok('an iPhone camera-style open is sent to /c',
+  home({ 'user-agent': IPHONE, 'sec-fetch-site': 'none' }));
+ok('an Android camera-style open is sent to /c',
+  home({ 'user-agent': ANDROID, 'sec-fetch-site': 'none' }));
+ok('a missing fetch-site header with no referrer still redirects (older browsers)',
+  home({ 'user-agent': IPHONE }));
+ok('Google search on a phone is left on the homepage',
+  !home({
+    'user-agent': IPHONE,
+    'sec-fetch-site': 'cross-site',
+    referer: 'https://www.google.com/',
+  }));
+ok('a referrer without fetch-site is also left alone',
+  !home({ 'user-agent': IPHONE, referer: 'https://www.google.com/' }));
+ok('a same-origin click from the card is not treated as a scan',
+  !home({ 'user-agent': IPHONE, referer: 'https://joaquingalang.dev/c' }));
+ok('the seen-the-form cookie stops a second redirect',
+  !home({
+    'user-agent': IPHONE,
+    'sec-fetch-site': 'none',
+    cookie: `${GATE_COOKIE}=1`,
+  }));
+ok('a neighbouring cookie named almost the same does not count',
+  home({
+    'user-agent': IPHONE,
+    'sec-fetch-site': 'none',
+    cookie: `othercg=1; ${GATE_COOKIE}x=1`,
+  }));
+ok('desktop is left on the homepage',
+  !home({ 'user-agent': DESKTOP, 'sec-fetch-site': 'none' }));
+ok('Googlebot-Smartphone is not sent to the noindex gate',
+  !home({ 'user-agent': GOOGLEBOT_PHONE, 'sec-fetch-site': 'none' }));
+ok('a prerender of / is not sent to the gate',
+  !home({
+    'user-agent': IPHONE,
+    'sec-fetch-site': 'none',
+    'sec-purpose': 'prefetch;prerender',
+  }));
+ok('a query string is treated as a shared link, not a scan',
+  !shouldRedirectHomeToCard(
+    new Request('https://joaquingalang.dev/?utm_source=linkedin', {
+      headers: { 'user-agent': IPHONE, 'sec-fetch-site': 'none' },
+    }),
+  ));
+ok('POST / is ignored',
+  !home({ 'user-agent': IPHONE, 'sec-fetch-site': 'none' }, { method: 'POST' }));
+
+const previous = process.env.CARD_MISPRINT_REDIRECT;
+process.env.CARD_MISPRINT_REDIRECT = '0';
+ok('CARD_MISPRINT_REDIRECT=0 is a hard off switch',
+  !home({ 'user-agent': IPHONE, 'sec-fetch-site': 'none' }));
+if (previous === undefined) delete process.env.CARD_MISPRINT_REDIRECT;
+else process.env.CARD_MISPRINT_REDIRECT = previous;
 
 console.log('\nfailure isolation');
 process.env.UPSTASH_REDIS_REST_URL = 'https://not-a-real-host.invalid';

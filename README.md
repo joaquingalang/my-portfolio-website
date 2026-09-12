@@ -121,10 +121,12 @@ request.
 
 ```
 vercel.json          rewrites /c, /e and the .vcf paths onto the functions
+middleware.ts        / → /c for likely scans of the misprinted QR (see below)
 api/card.ts          renders the page
 api/vcard.ts         generates the vCard 3.0 file
 api/_lib/profile.ts  name, title, email, phone, links — single source of truth
 api/_lib/analytics.ts server-side visit counter
+api/_lib/misprint.ts homepage-redirect heuristic and the seen-the-form cookie
 api/_lib/photo.ts    the portrait, base64, for the vCard PHOTO property
 ```
 
@@ -168,6 +170,39 @@ Two details worth knowing before editing:
   fields can never hold anything a stranger typed. A honeypot field and a
   "faster than a person can type" check drop bot submissions silently — they
   still get the normal redirect, so they cannot tell.
+
+### Misprinted QR
+
+The first print run encodes `joaquingalang.dev` instead of `joaquingalang.dev/c`.
+Until that stock is out of pockets, Vercel middleware on `/` sends a **likely
+scan** to the gate instead of the homepage.
+
+A request is treated as a scan only when all of these hold:
+
+- GET of exactly `/` with no query string
+- the User-Agent looks like a phone (not a tablet or a desktop)
+- it is not a bot or a prefetch — Googlebot-Smartphone has "Mobile" in its UA
+  and must never be sent to the noindex gate
+- the browser does not already have the `cg=1` cookie
+- the navigation looks direct: `Sec-Fetch-Site: none` (what a camera app sends),
+  or that header is missing **and** there is no Referer at all (a click from
+  the card to the site carries one, and must not bounce back to the gate)
+
+Skip or a successful submit sets `cg=1` (HttpOnly, Secure, SameSite=Lax, one
+year). The cookie is a functional flag — it is never written to Redis and never
+joined to `visits:*` or `leads:*`. The gate GET does not set it, so a bounce
+still hits the form on the next scan.
+
+This is not a client-side redirect in the React app: that would flash the
+homepage, require JavaScript, and hijack every first-time phone visitor.
+
+Leave it on after the reprint. New stock hits `/c` directly; old cards still
+open `/`. Workaround traffic shows up in layer 1 as `visits:c` with referrer
+host `joaquingalang.dev`. Real `/c` scans stay `ref=-`.
+
+Turn off without a deploy by setting `CARD_MISPRINT_REDIRECT=0` on the Vercel
+project. `npm run dev` does not run this middleware; `npm run card:test` does
+cover the heuristic.
 
 ### Local preview
 
