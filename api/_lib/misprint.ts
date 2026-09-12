@@ -89,20 +89,46 @@ function isBotOrPrefetch(request: Request): boolean {
   return /prefetch|preview|prerender/i.test(purpose);
 }
 
+function apexHost(host: string): string {
+  return host.replace(/^www\./i, '');
+}
+
+/**
+ * True when the Referer is this site's homepage — the HTTP→HTTPS (or www→apex)
+ * hop a camera makes after opening the printed `joaquingalang.dev` URL.
+ * A click from the card footer has path `/c` or `/e` and must not match.
+ */
+function isOwnHomepageReferer(request: Request): boolean {
+  const referer = request.headers.get('referer');
+  if (!referer) return true;
+  try {
+    const from = new URL(referer);
+    const here = new URL(request.url);
+    if (apexHost(from.hostname) !== apexHost(here.hostname)) return false;
+    return (from.pathname || '/') === '/';
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Phone cameras open a printed URL as a user-initiated navigation: no
- * previous page, so `Sec-Fetch-Site: none` and usually no Referer. Search,
- * social, and in-site clicks are `cross-site` / `same-origin` and must stay
- * on the homepage.
+ * previous page, so `Sec-Fetch-Site: none` and usually no Referer.
+ *
+ * The printed apex URL is often opened as `http://` first. Vercel upgrades
+ * that to HTTPS; the follow-up is `same-site` / `same-origin` with a Referer
+ * of `/`. Treat that hop as a scan. Search and social stay `cross-site`.
  *
  * When the fetch-site header is missing (older browsers), require no Referer
- * at all — not merely "no external one". A click from the card footer to `/`
- * carries a same-origin Referer; treating that as a scan would bounce the
- * person straight back to the gate.
+ * at all. A click from the card footer to `/` carries path `/c` or `/e` and
+ * must not bounce the person back to the gate.
  */
 function isDirectNavigation(request: Request): boolean {
   const site = (request.headers.get('sec-fetch-site') ?? '').toLowerCase();
   if (site === 'none') return true;
+  if (site === 'same-site' || site === 'same-origin') {
+    return isOwnHomepageReferer(request);
+  }
   if (site) return false;
   return !request.headers.get('referer');
 }

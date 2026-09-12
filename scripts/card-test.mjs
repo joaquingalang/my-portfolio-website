@@ -328,8 +328,30 @@ ok('Google search on a phone is left on the homepage',
   }));
 ok('a referrer without fetch-site is also left alone',
   !home({ 'user-agent': IPHONE, referer: 'https://www.google.com/' }));
+ok('an HTTP→HTTPS camera hop on the apex host is sent to /c',
+  home({
+    'user-agent': IPHONE,
+    'sec-fetch-site': 'same-site',
+    referer: 'http://joaquingalang.dev/',
+  }));
+ok('a same-origin hop from https://joaquingalang.dev/ is sent to /c',
+  home({
+    'user-agent': IPHONE,
+    'sec-fetch-site': 'same-origin',
+    referer: 'https://joaquingalang.dev/',
+  }));
+ok('a www→apex hop is sent to /c',
+  home({
+    'user-agent': IPHONE,
+    'sec-fetch-site': 'same-site',
+    referer: 'https://www.joaquingalang.dev/',
+  }));
 ok('a same-origin click from the card is not treated as a scan',
-  !home({ 'user-agent': IPHONE, referer: 'https://joaquingalang.dev/c' }));
+  !home({
+    'user-agent': IPHONE,
+    'sec-fetch-site': 'same-origin',
+    referer: 'https://joaquingalang.dev/c',
+  }));
 ok('the seen-the-form cookie stops a second redirect',
   !home({
     'user-agent': IPHONE,
