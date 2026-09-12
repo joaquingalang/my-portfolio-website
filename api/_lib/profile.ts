@@ -108,7 +108,8 @@ export interface CardLink {
  * handed to a client is worse than no description.
  */
 export const LINKS: CardLink[] = [
-  { label: 'Portfolio', href: SITE_URL },
+  // /?p=1 so a phone can open the site without the / → /c redirect.
+  { label: 'Portfolio', href: `${SITE_URL}/?p=1` },
   { label: 'GitHub', href: 'https://github.com/joaquingalang' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/joaquin-galang/' },
   { label: 'TrustMop', href: 'https://trustmop.net' },
