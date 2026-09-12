@@ -120,13 +120,13 @@ Functions that return a complete HTML document and record the visit during the
 request.
 
 ```
-vercel.json          rewrites /c, /e and the .vcf paths onto the functions
+vercel.json          rewrites /c, /e and the .vcf paths; proxy.entrypoint for middleware
 middleware.ts        / → /c for likely scans of the misprinted QR (see below)
 api/card.ts          renders the page
 api/vcard.ts         generates the vCard 3.0 file
 api/_lib/profile.ts  name, title, email, phone, links — single source of truth
-api/_lib/analytics.ts server-side visit counter
-api/_lib/misprint.ts homepage-redirect heuristic and the seen-the-form cookie
+api/_lib/analytics.ts server-side visit counter and leads
+api/_lib/misprint.ts homepage-redirect heuristic and the two cookies
 api/_lib/photo.ts    the portrait, base64, for the vCard PHOTO property
 ```
 
@@ -192,6 +192,14 @@ Skip or a successful submit sets `cg=1` (HttpOnly, Secure, SameSite=Lax, one
 year). The cookie is a functional flag — it is never written to Redis and never
 joined to `visits:*` or `leads:*`. The gate GET does not set it, so a bounce
 still hits the form on the next scan.
+
+The 302 also sets a short-lived `cs=h` cookie. When that browser then submits
+the gate, the lead is stored on `leads:c` as usual, with `via: "home"` so
+`npm run stats` can tell a misprinted-QR answer from a direct `/c` scan. Direct
+scans omit the field, so existing records do not change shape.
+
+The middleware is Node (not Edge), declared in `vercel.json` as
+`proxy.entrypoint`, so a Vite deploy actually runs it. Matcher is `/` only.
 
 This is not a client-side redirect in the React app: that would flash the
 homepage, require JavaScript, and hijack every first-time phone visitor.

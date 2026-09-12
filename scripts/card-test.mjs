@@ -42,7 +42,7 @@ const load = (name) => import(pathToFileURL(resolve(outdir, `${name}.mjs`)));
 const card = (await load('card')).default.fetch;
 const vcard = (await load('vcard')).default.fetch;
 const { isNoise, recordEvent } = await load('analytics');
-const { shouldRedirectHomeToCard, GATE_COOKIE } = await load('misprint');
+const { shouldRedirectHomeToCard, GATE_COOKIE, HOME_SOURCE_COOKIE } = await load('misprint');
 
 const IPHONE =
   'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
@@ -50,7 +50,7 @@ const req = (url, init = {}) =>
   new Request(url, { headers: { 'user-agent': IPHONE }, ...init });
 
 /** A gate submission, as a browser would send it with JavaScript switched off. */
-const post = (surface, fields) => {
+const post = (surface, fields, extraHeaders = {}) => {
   const body = new URLSearchParams();
   for (const [key, value] of Object.entries(fields)) {
     if (Array.isArray(value)) value.forEach((v) => body.append(key, v));
@@ -62,6 +62,7 @@ const post = (surface, fields) => {
       headers: {
         'user-agent': IPHONE,
         'content-type': 'application/x-www-form-urlencoded',
+        ...extraHeaders,
       },
       body: body.toString(),
     }),
@@ -211,6 +212,22 @@ ok('timestamped', typeof lead.ts === 'number' && lead.ts > 0);
 ok('device class, not a raw user-agent', lead.device === 'mobile' && !JSON.stringify(lead).includes('AppleWebKit'));
 ok('no ip, no cookie, no user-agent stored',
   !/ip|cookie|userAgent|user-agent/i.test(Object.keys(lead).join(',')));
+ok('a direct /c submit has no via tag', lead.via === undefined);
+
+reset();
+await post('c', {
+  name: 'Jordan Lee',
+  met: 'A conference or meetup',
+  reach: 'jordan@example.com',
+  t: UNHURRIED(),
+}, { cookie: `${HOME_SOURCE_COOKIE}=h` });
+ok('a misprint-path submit is still stored as a lead', leads().length === 1);
+const homeLead = leads().length ? JSON.parse(leads()[0][2]) : {};
+ok('…on leads:c, same as a direct scan', leads()[0]?.[1] === 'leads:c');
+ok('…with name and reach intact',
+  homeLead.name === 'Jordan Lee' && homeLead.reach === 'jordan@example.com');
+ok('…and tagged via home so npm run stats can tell them apart',
+  homeLead.via === 'home');
 
 reset();
 await post('c', { name: 'Bot', company: 'Acme Corp', t: UNHURRIED() });

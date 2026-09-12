@@ -10,7 +10,7 @@
  * Redis and never joined to `visits:*` or `leads:*`. The visit counter's "no
  * cookies" contract is unchanged.
  *
- * Kept free of the analytics module so the Edge middleware that imports this
+ * Kept free of the analytics module so the Routing Middleware that imports this
  * file does not pull Redis into its bundle.
  *
  * Turn off without a deploy: `CARD_MISPRINT_REDIRECT=0`.
@@ -20,6 +20,15 @@
 export const GATE_COOKIE = 'cg';
 
 const GATE_COOKIE_VALUE = '1';
+
+/**
+ * Set on the `/` → `/c` 302, read when the gate is submitted. Lets a lead from
+ * a misprinted-QR scan be told apart from one that opened `/c` directly —
+ * without writing the cookie itself into Redis.
+ */
+export const HOME_SOURCE_COOKIE = 'cs';
+
+const HOME_SOURCE_VALUE = 'h';
 
 /** One year. Long enough to outlast the misprinted stock. */
 const GATE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
@@ -37,6 +46,23 @@ export function gateCookieHeader(): string {
     `${GATE_COOKIE}=${GATE_COOKIE_VALUE}; Path=/; Max-Age=${GATE_COOKIE_MAX_AGE}; ` +
     'SameSite=Lax; Secure; HttpOnly'
   );
+}
+
+/** Lives long enough to fill the form; not the "already seen the gate" flag. */
+export function homeSourceCookieHeader(): string {
+  return (
+    `${HOME_SOURCE_COOKIE}=${HOME_SOURCE_VALUE}; Path=/; Max-Age=86400; ` +
+    'SameSite=Lax; Secure; HttpOnly'
+  );
+}
+
+export function homeSourceFromRequest(request: Request): 'home' | null {
+  const cookie = request.headers.get('cookie') ?? '';
+  return new RegExp(
+    `(?:^|;\\s*)${HOME_SOURCE_COOKIE}=${HOME_SOURCE_VALUE}(?:;|$)`,
+  ).test(cookie)
+    ? 'home'
+    : null;
 }
 
 export function hasGateCookie(request: Request): boolean {

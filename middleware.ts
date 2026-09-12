@@ -8,15 +8,28 @@
  * Matcher is `/` only, so `/c`, `/e`, and static assets never enter here.
  */
 import { next } from '@vercel/functions';
-import { shouldRedirectHomeToCard } from './api/_lib/misprint.js';
+import {
+  homeSourceCookieHeader,
+  shouldRedirectHomeToCard,
+} from './api/_lib/misprint.js';
 
-export const config = { matcher: '/' };
+export const config = {
+  // Node, not Edge: same runtime as `/api/card`, and the `proxy.entrypoint`
+  // path Vercel documents for non-Next frameworks (Vite included).
+  runtime: 'nodejs',
+  matcher: '/',
+};
 
 export default function middleware(request: Request): Response {
   if (shouldRedirectHomeToCard(request)) {
     return new Response(null, {
       status: 302,
-      headers: { Location: '/c' },
+      headers: {
+        Location: '/c',
+        // Tags the upcoming gate submit as a misprint-path lead. Separate
+        // from `cg=1`, which is set only after skip/submit.
+        'Set-Cookie': homeSourceCookieHeader(),
+      },
     });
   }
   return next();

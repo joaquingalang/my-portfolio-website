@@ -170,7 +170,7 @@ async function leads(counts) {
 
   for (const lead of recent) {
     const day = new Date(lead.ts).toISOString().slice(0, 10);
-    console.log(`  ${day}  ${lead.name}  (/${lead.surface}, ${lead.device})`);
+    console.log(`  ${day}  ${lead.name}  (/${lead.surface}, ${lead.device}${lead.via === 'home' ? ', via /' : ''})`);
     const where = [lead.met, (lead.intent ?? []).join(', ')].filter(Boolean).join('  ·  ');
     if (where) console.log(`              ${where}`);
     if (lead.reach) console.log(`              ${lead.reach}`);
