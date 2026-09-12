@@ -451,6 +451,7 @@ function renderCard(surface: Surface): string {
 <script>
   // Progressive enhancement only. The download works identically when this
   // script is blocked, which on a privacy browser it will be.
+  try { localStorage.setItem('cg', '1'); } catch (e) {}
   document.getElementById('save-contact').addEventListener('click', function () {
     if (window.va) window.va('event', { name: 'save_contact', data: { surface: '${surface}' } });
   });

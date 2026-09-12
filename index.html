@@ -2,6 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      (function () {
+        if (location.pathname !== '/' || location.search) return;
+        try { if (localStorage.getItem('cg') === '1') return; } catch (e) { return; }
+        var ua = navigator.userAgent;
+        if (/ipad|tablet|playbook|silk|(android(?!.*mobile))/i.test(ua)) return;
+        if (!/mobi|iphone|ipod|android|blackberry|iemobile|opera mini/i.test(ua)) return;
+        location.replace('/c');
+      })();
+    </script>
     <link rel="icon" href="/portfolio_icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0B0B0D" />
