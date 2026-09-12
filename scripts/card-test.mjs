@@ -94,6 +94,8 @@ ok('200', rg.status === 200);
 ok('serves html', rg.headers.get('content-type') === 'text/html; charset=utf-8');
 ok('gate does not set the seen-the-form cookie',
   !rg.headers.get('set-cookie')?.includes(`${GATE_COOKIE}=`));
+ok('gate does not write localStorage, so a bounce still hits /c next time',
+  !hg.includes('localStorage.setItem'));
 ok('uncached, so every scan is counted', rg.headers.get('cache-control') === 'no-store');
 ok('is a real form post (works with JS off)',
   /<form class="gate" method="post" action="\/c">/.test(hg));
@@ -136,6 +138,8 @@ const hc = await rc.text();
 ok('200', rc.status === 200);
 ok('skip sets the seen-the-form cookie',
   (rc.headers.get('set-cookie') ?? '').includes(`${GATE_COOKIE}=1`));
+ok('the reveal writes localStorage so the homepage script can see it',
+  hc.includes("localStorage.setItem('cg', '1')"));
 ok('save contact is present', hc.includes('>Save contact<'));
 ok('save contact is a plain anchor (works with JS off)',
   /<a class="cta"[^>]*href="\/c\/contact\.vcf"[^>]*download=/.test(hc));
@@ -320,14 +324,12 @@ ok('an Android camera-style open is sent to /c',
   home({ 'user-agent': ANDROID, 'sec-fetch-site': 'none' }));
 ok('a missing fetch-site header with no referrer still redirects (older browsers)',
   home({ 'user-agent': IPHONE }));
-ok('Google search on a phone is left on the homepage',
-  !home({
+ok('a first-time phone from Google is sent to /c (header sniffing missed apex scans)',
+  home({
     'user-agent': IPHONE,
     'sec-fetch-site': 'cross-site',
     referer: 'https://www.google.com/',
   }));
-ok('a referrer without fetch-site is also left alone',
-  !home({ 'user-agent': IPHONE, referer: 'https://www.google.com/' }));
 ok('an HTTP→HTTPS camera hop on the apex host is sent to /c',
   home({
     'user-agent': IPHONE,
@@ -345,12 +347,6 @@ ok('a www→apex hop is sent to /c',
     'user-agent': IPHONE,
     'sec-fetch-site': 'same-site',
     referer: 'https://www.joaquingalang.dev/',
-  }));
-ok('a same-origin click from the card is not treated as a scan',
-  !home({
-    'user-agent': IPHONE,
-    'sec-fetch-site': 'same-origin',
-    referer: 'https://joaquingalang.dev/c',
   }));
 ok('the seen-the-form cookie stops a second redirect',
   !home({

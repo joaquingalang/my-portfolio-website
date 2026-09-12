@@ -2,9 +2,9 @@
  * Temporary workaround for the first print run of the calling card.
  *
  * The QR on those cards encodes `joaquingalang.dev` instead of
- * `joaquingalang.dev/c`. Until that stock is gone, a phone that opens `/` as a
- * direct navigation is sent to the gate, then a first-party cookie remembers
- * they have already been through it.
+ * `joaquingalang.dev/c`. Until that stock is gone, a first-time phone that
+ * opens `/` is sent to the gate — header sniffing missed real camera hops —
+ * then a first-party cookie remembers they have already been through it.
  *
  * This is a functional flag, not tracking: the cookie is never written to
  * Redis and never joined to `visits:*` or `leads:*`. The visit counter's "no
@@ -89,54 +89,11 @@ function isBotOrPrefetch(request: Request): boolean {
   return /prefetch|preview|prerender/i.test(purpose);
 }
 
-function apexHost(host: string): string {
-  return host.replace(/^www\./i, '');
-}
-
 /**
- * True when the Referer is this site's homepage — the HTTP→HTTPS (or www→apex)
- * hop a camera makes after opening the printed `joaquingalang.dev` URL.
- * A click from the card footer has path `/c` or `/e` and must not match.
- */
-function isOwnHomepageReferer(request: Request): boolean {
-  const referer = request.headers.get('referer');
-  if (!referer) return true;
-  try {
-    const from = new URL(referer);
-    const here = new URL(request.url);
-    if (apexHost(from.hostname) !== apexHost(here.hostname)) return false;
-    return (from.pathname || '/') === '/';
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Phone cameras open a printed URL as a user-initiated navigation: no
- * previous page, so `Sec-Fetch-Site: none` and usually no Referer.
- *
- * The printed apex URL is often opened as `http://` first. Vercel upgrades
- * that to HTTPS; the follow-up is `same-site` / `same-origin` with a Referer
- * of `/`. Treat that hop as a scan. Search and social stay `cross-site`.
- *
- * When the fetch-site header is missing (older browsers), require no Referer
- * at all. A click from the card footer to `/` carries path `/c` or `/e` and
- * must not bounce the person back to the gate.
- */
-function isDirectNavigation(request: Request): boolean {
-  const site = (request.headers.get('sec-fetch-site') ?? '').toLowerCase();
-  if (site === 'none') return true;
-  if (site === 'same-site' || site === 'same-origin') {
-    return isOwnHomepageReferer(request);
-  }
-  if (site) return false;
-  return !request.headers.get('referer');
-}
-
-/**
- * True when `/` should 302 to `/c`. Matcher in middleware.ts already limits
- * this to `/`, but the path and query are checked here so the tests do not
- * have to pretend to be Vercel.
+ * True when `/` should 302 to `/c`. Camera header sniffing missed real apex
+ * scans, so every first-time phone on `/` is sent to the gate. Matcher in
+ * middleware.ts already limits this to `/`; the path and query are checked
+ * here so the tests do not have to pretend to be Vercel.
  */
 export function shouldRedirectHomeToCard(request: Request): boolean {
   if (process.env.CARD_MISPRINT_REDIRECT === '0') return false;
@@ -147,7 +104,5 @@ export function shouldRedirectHomeToCard(request: Request): boolean {
 
   if (hasGateCookie(request)) return false;
   if (isBotOrPrefetch(request)) return false;
-  if (!isPhone(request.headers.get('user-agent') ?? '')) return false;
-
-  return isDirectNavigation(request);
+  return isPhone(request.headers.get('user-agent') ?? '');
 }
