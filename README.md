@@ -185,8 +185,11 @@ A request is treated as a scan only when all of these hold:
   and must never be sent to the noindex gate
 - the browser does not already have the `cg=1` cookie
 - the navigation looks direct: `Sec-Fetch-Site: none` (what a camera app sends),
-  or that header is missing **and** there is no Referer at all (a click from
-  the card to the site carries one, and must not bounce back to the gate)
+  or `same-site` / `same-origin` with a Referer that is this site's homepage
+  (the HTTP→HTTPS hop after a camera opens the printed apex URL), or that
+  header is missing **and** there is no Referer at all. A click from the card
+  footer carries path `/c` or `/e` and must not bounce back to the gate.
+  `cross-site` (Google, LinkedIn) stays on the homepage.
 
 Skip or a successful submit sets `cg=1` (HttpOnly, Secure, SameSite=Lax, one
 year). The cookie is a functional flag — it is never written to Redis and never
