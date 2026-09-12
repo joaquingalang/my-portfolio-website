@@ -409,7 +409,7 @@ function shell(body: string, script = ''): string {
 <body>
 <main class="card">
 ${body}
-  <footer><a href="${escapeHtml(SITE_URL)}">joaquingalang.dev</a></footer>
+  <footer><a href="${escapeHtml(`${SITE_URL}/?p=1`)}">joaquingalang.dev</a></footer>
 </main>
 
 <script defer src="/_vercel/insights/script.js"></script>${script}

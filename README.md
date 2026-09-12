@@ -175,7 +175,9 @@ Two details worth knowing before editing:
 
 The first print run encodes `joaquingalang.dev` instead of `joaquingalang.dev/c`.
 Until that stock is out of pockets, **every phone** on `/` is sent to `/c`.
-The homepage is not a phone destination.
+The homepage is not a phone destination. The card’s Portfolio link (and the
+footer site link) use `/?p=1` so a phone can open the site without bouncing
+back to `/c`.
 
 The gate still asks who they are, unless that browser already **submitted**
 the form. Then they get the contact card (`/c?v=1`). Skip is a one-off peek:

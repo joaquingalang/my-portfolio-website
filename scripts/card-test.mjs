@@ -149,6 +149,10 @@ ok('email', hc.includes('mailto:galang.joaquin.dev@gmail.com'));
 ok('whatsapp uses E.164 digits', hc.includes('https://wa.me/639156175207'));
 ok('all five links render', ['Portfolio', 'GitHub', 'LinkedIn', 'TrustMop', 'Marahuyo Studios']
   .every((l) => hc.includes(`<span>${l}</span>`)));
+ok('Portfolio uses /?p=1 so a phone can open the site',
+  hc.includes('href="https://joaquingalang.dev/?p=1"') && hc.includes('>Portfolio<'));
+ok('footer site link uses the same /?p=1 bypass',
+  hc.includes('<footer><a href="https://joaquingalang.dev/?p=1">joaquingalang.dev</a></footer>'));
 ok('surface tagged for analytics', hc.includes("surface: 'c'"));
 ok('the form is gone', !hc.includes('<form'));
 ok('the portrait and name live here now', hc.includes('joaquin.webp') && hc.includes('<h1>Joaquin Galang</h1>'));
@@ -398,6 +402,12 @@ ok('a prerender of / is not sent to the gate',
 ok('a query string is treated as a shared link, not a scan',
   !shouldRedirectHomeToCard(
     new Request('https://joaquingalang.dev/?utm_source=linkedin', {
+      headers: { 'user-agent': IPHONE, 'sec-fetch-site': 'none' },
+    }),
+  ));
+ok('the card Portfolio link /?p=1 does not redirect a phone',
+  !shouldRedirectHomeToCard(
+    new Request('https://joaquingalang.dev/?p=1', {
       headers: { 'user-agent': IPHONE, 'sec-fetch-site': 'none' },
     }),
   ));
