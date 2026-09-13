@@ -117,6 +117,12 @@ ok('honeypot is present and unfocusable', /id="company"[^>]*tabindex="-1"/.test(
 ok('inputs are 16px, so iOS does not zoom on focus', /\.inp, \.sel \{[^}]*font-size: 1rem/.test(hg));
 ok('no unresolved values', !hg.includes('undefined') && !hg.includes('[object'));
 ok('no placeholder content', !/lorem|TODO|PLACEHOLDER|FIXME/i.test(copyOf(hg)));
+ok('og:image is the branded card, not the favicon',
+  hg.includes('property="og:image" content="https://joaquingalang.dev/og.png"'));
+ok('og:url is the printed /c path',
+  hg.includes('property="og:url" content="https://joaquingalang.dev/c"'));
+ok('twitter large image card',
+  hg.includes('name="twitter:card" content="summary_large_image"'));
 
 console.log('\n  …and actually gates');
 ok('no vCard link', !hg.includes('contact.vcf'));
@@ -167,6 +173,8 @@ ok('distinguishable in layer 2', he.includes("surface: 'e'"));
 const heg = await (await card(req('https://joaquingalang.dev/api/card?s=e'))).text();
 ok('/e is gated too', heg.includes('<form class="gate" method="post" action="/e">'));
 ok('/e skip goes to /e', heg.includes('href="/e?v=1"'));
+ok('/e og:url is its own path',
+  heg.includes('property="og:url" content="https://joaquingalang.dev/e"'));
 
 console.log('\nsubmitting the gate');
 const rOk = await post('c', { name: 'Maria Santos', t: UNHURRIED() });
