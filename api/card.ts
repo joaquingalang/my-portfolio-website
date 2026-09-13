@@ -387,8 +387,12 @@ const DOWNLOAD =
   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>';
 
 /** Head, styles and portrait — everything the two views share. */
-function shell(body: string, script = ''): string {
-  const description = `${FULL_NAME} — ${TITLE}. ${TAGLINE}`;
+function shell(surface: Surface, body: string, script = ''): string {
+  const title = `${FULL_NAME} — ${TITLE}`;
+  const description = TAGLINE;
+  const pageUrl = `${SITE_URL}/${surface}`;
+  const imageUrl = `${SITE_URL}/og.png`;
+  const imageAlt = `${title}. ${TAGLINE}`;
 
   return `<!doctype html>
 <html lang="en">
@@ -396,10 +400,25 @@ function shell(body: string, script = ''): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0B0B0D">
-<title>${escapeHtml(FULL_NAME)} — ${escapeHtml(TITLE)}</title>
+<title>${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(description)}">
 <!-- A calling card, not a page that should surface in search. -->
 <meta name="robots" content="noindex">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="${escapeHtml(FULL_NAME)}">
+<meta property="og:url" content="${escapeHtml(pageUrl)}">
+<meta property="og:title" content="${escapeHtml(title)}">
+<meta property="og:description" content="${escapeHtml(description)}">
+<meta property="og:image" content="${escapeHtml(imageUrl)}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${escapeHtml(imageAlt)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${escapeHtml(title)}">
+<meta name="twitter:description" content="${escapeHtml(description)}">
+<meta name="twitter:image" content="${escapeHtml(imageUrl)}">
+<meta name="twitter:image:alt" content="${escapeHtml(imageAlt)}">
 <link rel="icon" href="/portfolio_icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -460,7 +479,7 @@ ${remember}  document.getElementById('save-contact').addEventListener('click', f
   });
 </script>`;
 
-  return shell(body, script);
+  return shell(surface, body, script);
 }
 
 /**
@@ -532,7 +551,7 @@ function renderGate(surface: Surface, error = ''): string {
     <p class="fineprint">This goes to Joaquin&rsquo;s inbox. Nowhere else.</p>
   </form>`;
 
-  return shell(body);
+  return shell(surface, body);
 }
 
 /** Trim, collapse whitespace, and cap — applied to every free-text field. */
