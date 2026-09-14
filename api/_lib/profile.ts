@@ -112,6 +112,7 @@ export const LINKS: CardLink[] = [
   { label: 'Portfolio', href: `${SITE_URL}/?p=1` },
   { label: 'GitHub', href: 'https://github.com/joaquingalang' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/joaquin-galang/' },
+  { label: 'Instagram', href: 'https://www.instagram.com/quingalang/' },
   { label: 'TrustMop', href: 'https://trustmop.net' },
   { label: 'Marahuyo Studios', href: 'https://marahuyostudios.com' },
 ];
