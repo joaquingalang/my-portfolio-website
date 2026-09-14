@@ -128,8 +128,8 @@ console.log('\n  …and actually gates');
 ok('no vCard link', !hg.includes('contact.vcf'));
 ok('no email address', !hg.includes('galang.joaquin.dev@gmail.com'));
 ok('no whatsapp number', !hg.includes('wa.me'));
-ok('no github / linkedin / venture links',
-  !/github\.com|linkedin\.com|trustmop|marahuyo/i.test(hg));
+ok('no github / linkedin / instagram / venture links',
+  !/github\.com|linkedin\.com|instagram\.com|trustmop|marahuyo/i.test(hg));
 ok('no portrait — the gate leads with the question', !hg.includes('joaquin.webp'));
 ok('…and asks it', hg.includes('<h1>Who do I have?</h1>'));
 ok('…under its eyebrow', hg.includes('<p class="kicker">Before we get to it</p>'));
@@ -153,8 +153,11 @@ ok('save contact is a plain anchor (works with JS off)',
 ok('vcf points at /c', hc.includes('href="/c/contact.vcf"'));
 ok('email', hc.includes('mailto:galang.joaquin.dev@gmail.com'));
 ok('whatsapp uses E.164 digits', hc.includes('https://wa.me/639156175207'));
-ok('all five links render', ['Portfolio', 'GitHub', 'LinkedIn', 'TrustMop', 'Marahuyo Studios']
+ok('all six links render', ['Portfolio', 'GitHub', 'LinkedIn', 'Instagram', 'TrustMop', 'Marahuyo Studios']
   .every((l) => hc.includes(`<span>${l}</span>`)));
+ok('instagram sits below linkedin',
+  hc.indexOf('>LinkedIn<') < hc.indexOf('>Instagram<') &&
+  hc.includes('href="https://www.instagram.com/quingalang/"'));
 ok('Portfolio uses /?p=1 so a phone can open the site',
   hc.includes('href="https://joaquingalang.dev/?p=1"') && hc.includes('>Portfolio<'));
 ok('footer site link uses the same /?p=1 bypass',
