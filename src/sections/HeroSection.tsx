@@ -4,7 +4,7 @@ import Button from "../components/Button";
 import JoaquinProfile from "../assets/images/joaquin_profile.webp";
 
 const CV_URL =
-    "https://drive.google.com/file/d/1EwVW_YXibQH2VvfNaptXbqtXi5SQX04_/view?usp=sharing";
+    "https://drive.google.com/file/d/1BisUdqhZc3wgtmkSque6_gIrJ5P9_4Xg/view?usp=sharing";
 
 function HeroSection() {
     return (
