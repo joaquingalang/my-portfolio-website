@@ -298,3 +298,5 @@ print(base64.b64encode(buf.getvalue()).decode())
 
 Keep the vCard photo small — a bloated `.vcf` makes iOS slow to open the Add
 Contact sheet, which is the one interaction that must not stall.
+
+Last Updated: 10/05/2026
